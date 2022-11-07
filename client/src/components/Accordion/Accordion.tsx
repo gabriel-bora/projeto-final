@@ -218,6 +218,30 @@ const Accordion: React.FC<DadosCRM> = ({
     }
   }
 
+  let listaAceites1: any[] = [];
+  if (listaAceites !== undefined) {
+    listaAceites1 = listaAceites;
+  }
+
+  let listaSetoresAceite: any[] = [];
+  listaAceites1.map((value: any) =>
+    listaSetoresAceite.push(value.colaborador_setor)
+  );
+
+  let diferenca = listaSetores.filter(function (element, index, array) {
+    if (listaSetoresAceite.indexOf(element) == -1) return element;
+  });
+  let status: string = "";
+  if (listaAceites1.some((v) => v.aceite === "nao")) {
+    status = "rejeitada";
+  } else if (diferenca.length === 0) {
+    status = "arquivada";
+  } else {
+    status = "pendente";
+  }
+
+  console.log(status);
+
   const aceitar = () => {
     axios
       .post("http://localhost:3001/createAccept", {
@@ -274,21 +298,6 @@ const Accordion: React.FC<DadosCRM> = ({
       default:
         return <div className="complexidade-zero">. . .</div>;
     }
-  }
-
-  let listaAceites1: any[] = [];
-  if (listaAceites !== undefined) {
-    listaAceites1 = listaAceites;
-  }
-
-  let listaSetoresAceite: any[] = [];
-  listaAceites1.map((value: any) =>
-    listaSetoresAceite.push(value.colaborador_setor)
-  );
-
-  let status: string = "pendente";
-  if (listaAceites1.some((v) => v.aceite === "nao")) {
-    status = "rejeitada";
   }
 
   return (
