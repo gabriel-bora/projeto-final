@@ -1,0 +1,77 @@
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@iamlizu/image-buffer": "^1.0.0",
+    "@mui/icons-material": "^5.10.9",
+    "@mui/material": "^5.10.12",
+    "@mui/styled-engine-sc": "^5.10.6",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.11.64",
+    "@types/react": "^18.0.21",
+    "@types/react-dom": "^18.0.6",
+    "axios": "^1.1.3",
+    "bootstrap": "^5.2.2",
+    "bootstrap-icons": "^1.9.1",
+    "buffer": "^6.0.3",
+    "buffer-image": "^1.0.0",
+    "express": "^4.18.2",
+    "file-system": "^2.2.2",
+    "fs": "^0.0.1-security",
+    "image-to-base64": "^2.2.0",
+    "moment": "^2.29.4",
+    "mysql2": "^2.3.3",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.5.0",
+    "react-calendar": "^3.9.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.4.2",
+    "react-scripts": "5.0.1",
+    "reactstrap": "^9.1.4",
+    "sequelize": "^6.25.3",
+    "styled-components": "^5.3.6",
+    "typescript": "^4.8.4",
+    "web-vitals": "^2.1.4"
+  },
+  "homepage": "https://gabriel-bora.github.io/projeto-final-crm",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/image-to-base64": "^2.1.0",
+    "@types/react-calendar": "^3.5.3",
+    "@types/react-router-dom": "^5.3.3",
+    "@types/styled-components": "^5.1.26",
+    "gh-pages": "^4.0.0",
+    "nodemon": "^2.0.20"
+  }
+}
