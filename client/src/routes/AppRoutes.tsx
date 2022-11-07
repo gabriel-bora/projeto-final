@@ -4,6 +4,7 @@ import Index from "../pages/Index";
 import Home from "../pages/Home";
 import AddCRM from "../pages/AddCRM";
 import EditUser from "../pages/EditUser";
+import EditCRM from "../pages/EditCRM";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -13,6 +14,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/home" element={<Home />} />
         <Route path="/addcrm" element={<AddCRM />} />
         <Route path="/edituser" element={<EditUser />} />
+        <Route path="/editcrm" element={<EditCRM />} />
       </Routes>
     </BrowserRouter>
   );

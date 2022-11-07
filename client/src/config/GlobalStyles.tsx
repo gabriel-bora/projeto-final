@@ -1,18 +1,33 @@
 import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
-    * {
-        font-family: "Mulish", sans-serif;
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;   
-    }
+  * {
+      font-family: "Mulish", sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;   
+  }
 
-    body {
-        overflow: hidden;
-    }
+  body::-webkit-scrollbar {
+    width: 0.8rem;
+  }
 
-    textarea {
+  body::-webkit-scrollbar-track {
+    border-radius: 1rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+
+  body::-webkit-scrollbar-thumb {
+    background: rgba(33, 104, 0, 0.4);
+    border-radius: 1rem;
+  }
+
+  body::-webkit-scrollbar-thumb:hover {
+    background: rgba(33, 104, 0, 0.7);
+  }
+
+  textarea {
     height: 200px;
     width: 96%;
     margin-left: 2%;

@@ -69,7 +69,6 @@ const User: React.FC = () => {
       const reader = new FileReader();
       reader.readAsBinaryString(fileRef);
       reader.onload = (ev: any) => {
-        // convert it to base64
         setFotoNova(`data:${fileType};base64,${btoa(ev.target.result)}`);
       };
     }

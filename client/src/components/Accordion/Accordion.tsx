@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable eqeqeq */
@@ -10,6 +11,7 @@ import UserAccept from "../UserAccept/UserAccept";
 import * as moment from "moment";
 import "moment/locale/pt-br";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface DadosCRM {
   id: number;
@@ -68,6 +70,8 @@ const Accordion: React.FC<DadosCRM> = ({
   email,
   foto_perfil,
 }) => {
+  const navigate = useNavigate();
+
   const [showRejeitar, setShowRejeitar] = useState(false);
   const handleCloseRejeitar = () => setShowRejeitar(false);
   const handleShowRejeitar = () => setShowRejeitar(true);
@@ -240,7 +244,17 @@ const Accordion: React.FC<DadosCRM> = ({
     status = "pendente";
   }
 
-  console.log(status);
+  const arquivar = () => {
+    axios
+      .post("http://localhost:3001/updateCRM", {
+        id: id,
+        versao_crm: versao_crm,
+        data_arquivamento: today,
+      })
+      .then((response) => {
+        alert(response.data);
+      });
+  };
 
   const aceitar = () => {
     axios
@@ -258,6 +272,13 @@ const Accordion: React.FC<DadosCRM> = ({
       .then((response) => {
         alert(response.data);
       });
+    if (
+      diferenca.length === 1 &&
+      diferenca[0] === setorUsuario &&
+      complexidade !== 0
+    ) {
+      arquivar();
+    }
     window.location.reload();
   };
 
@@ -300,6 +321,51 @@ const Accordion: React.FC<DadosCRM> = ({
     }
   }
 
+  function switchStatus(status: string) {
+    switch (status) {
+      case "rejeitada":
+        return <i className="fa-solid fa-circle-xmark reject-status"></i>;
+      case "arquivada":
+        return <i className="fa-solid fa-circle-check check-status"></i>;
+      case "pendente":
+        return (
+          <i className="fa-solid fa-circle pending-status">
+            <i className="fa-solid fa-ellipsis pending-status-dots"></i>
+          </i>
+        );
+      default:
+        return null;
+    }
+  }
+
+  const [complexidadeUpdate, setComplexidadeUpdate] = useState<number>();
+  const [impactoTI, setImpactoTI] = useState<string>();
+
+  function salvarDetalhesTI() {
+    axios
+      .post("http://localhost:3001/updateCRM_TI", {
+        id: id,
+        versao_crm: versao_crm,
+        complexidade: complexidadeUpdate,
+        impacto_ti: impactoTI,
+      })
+      .then((response) => {
+        alert(response.data);
+      });
+    if (diferenca.length === 0 && complexidadeUpdate !== 0) {
+      arquivar();
+    }
+    window.location.reload();
+  }
+
+  function editar_crm() {
+    localStorage.setItem(
+      "id-versao-crm",
+      JSON.stringify({ id: id, versao: versao_crm })
+    );
+    navigate("/editcrm");
+  }
+
   return (
     <AccordionStyled foto_perfil={foto_perfil}>
       <div className="accordion my-2" id="accordionExample">
@@ -315,9 +381,7 @@ const Accordion: React.FC<DadosCRM> = ({
           >
             <div className="container-fluid info-crm-fechado">
               <div className="row d-flex align-items-center">
-                <div className="col-1">
-                  <i className="fa-solid fa-circle-check check-status"></i>
-                </div>
+                <div className="col-1 p-1">{switchStatus(status)}</div>
                 <div className="col-2">
                   <div className="texto-bold">{n}</div>
                   <div className="texto-light pt-1">
@@ -357,9 +421,22 @@ const Accordion: React.FC<DadosCRM> = ({
                   Necessidade: {necessidade}
                 </div>
                 <div className="col-2 d-flex justify-content-center">
-                  <button className="botao-editar botao-editar-habilitado">
-                    EDITAR CRM
-                  </button>
+                  {setorUsuario === colaborador_setor &&
+                  data_arquivamento === null ? (
+                    <button
+                      className="botao-editar botao-editar-habilitado"
+                      onClick={editar_crm}
+                    >
+                      EDITAR CRM
+                    </button>
+                  ) : (
+                    <button
+                      className="botao-editar botao-editar-desabilitado"
+                      disabled
+                    >
+                      EDITAR CRM
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -394,69 +471,6 @@ const Accordion: React.FC<DadosCRM> = ({
                   </div>
                   <div className="div-usuario mt-3">
                     <h6>Setores participantes:</h6>
-                    {/* <h6 className="ps-3 pt-1">Contabilidade:</h6>
-                    <div className="ps-3 d-flex">
-                      <div className="foto-colaborador mt-2"></div>
-                      <div className="ps-4">
-                        <p className="texto-usuario">Nome: Marina Castro</p>
-                        <p className="texto-usuario">Matrícula: 091894</p>
-
-                        <p className="texto-usuario">
-                          Telefone: (99) 99999-9999
-                        </p>
-                        <p className="texto-usuario">
-                          E-mail: marina.castro@quero-quero.com.br
-                        </p>
-                      </div>
-                      <div className="pt-2">
-                        <i className="fa-solid fa-circle-check check-setor"></i>
-                      </div>
-                    </div> */}
-                    {/* <h6 className="ps-3 pt-3">Lorem:</h6>
-                    <div className="ps-3 d-flex">
-                      <div className="foto-colaborador-2 mt-2"></div>
-                      <div className="ps-4">
-                        <p className="texto-usuario">Nome: Bryan Montero</p>
-                        <p className="texto-usuario">Matrícula: 087045</p>
-
-                        <p className="texto-usuario">
-                          Telefone: (99) 99999-9999
-                        </p>
-                        <p className="texto-usuario">
-                          E-mail: bryan.montero@quero-quero.com.br
-                        </p>
-                      </div>
-                      <div className="pt-2">
-                        <button className="div-reject" onClick={handleShow2}>
-                          <i className="fa-solid fa-times-circle reject-setor"></i>
-                        </button>
-                        <Modal size="lg" show={show2} onHide={handleClose2}>
-                          <Modal.Header closeButton>
-                            <Modal.Title>
-                              Justificativa rejeição setor Lorem:
-                            </Modal.Title>
-                          </Modal.Header>
-                          <Modal.Body>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                            elit. Sed non semper elit, vitae vulputate felis.
-                            Mauris maximus et risus at interdum. Sed ut vehicula
-                            lacus, sit amet tristique enim. Sed elementum magna
-                            a ante pharetra commodo. Quisque a accumsan mi.
-                            Nullam varius rhoncus quam, a scelerisque justo
-                            scelerisque vel. Nam luctus eleifend ipsum ac
-                            elementum. Proin ante tellus, aliquam eget tortor
-                            imperdiet, rutrum varius diam. Mauris volutpat eget
-                            nulla id rutrum. Proin sed tincidunt lacus. Fusce
-                            dictum sollicitudin risus in mattis.
-                          </Modal.Body>
-                          <Modal.Footer>
-                            <Button variant="danger" onClick={handleClose2}>
-                              OK
-                            </Button>
-                          </Modal.Footer>
-                        </Modal>
-                      </div>
-                    </div> */}
                     {listaSetores.map((value: string) => (
                       <>
                         {listaSetoresAceite.indexOf(value) > -1 ? (
@@ -684,87 +698,95 @@ const Accordion: React.FC<DadosCRM> = ({
                       </>
                     ))}
                   </div>
-                  <div className="div-usuario mt-2">
-                    <h6 className="pt-3">Sistemas envolvidos:</h6>
-                    <ul>
-                      {listaSistemas.map((value: string) => (
-                        <li className="mt-2">{value}</li>
-                      ))}
-                    </ul>
-                  </div>
+                  {listaSistemas.length > 0 ? (
+                    <div className="div-usuario mt-2">
+                      <h6 className="pt-3">Sistemas envolvidos:</h6>
+                      <ul>
+                        {listaSistemas.map((value: string) => (
+                          <li className="mt-2">{value}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
                   <div>
                     <h6 className="pt-3">Documentos:</h6>
                     <div className="ms-3 documentos">
-                      <div className="d-flex">
-                        {documento_anexo && (
-                          <>
-                            {documento_anexo.indexOf("image/") > -1 && (
-                              <a
-                                href={documento_anexo}
-                                download={nome_documento}
-                                className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                              >
-                                <i className="far fa-file-image download"></i>
-                                <p className="texto-usuario">
-                                  {nome_documento}
-                                </p>
-                              </a>
-                            )}
-                            {documento_anexo.indexOf("application/pdf") >
-                              -1 && (
-                              <a
-                                href={documento_anexo}
-                                download={nome_documento}
-                                className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                              >
-                                <i className="far fa-file-pdf download"></i>
-                                <p className="texto-usuario">
-                                  {nome_documento}
-                                </p>
-                              </a>
-                            )}
-                            {documento_anexo.indexOf("application/msword") >
-                              -1 && (
-                              <a
-                                href={documento_anexo}
-                                download={nome_documento}
-                                className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                              >
-                                <i className="far fa-file-word download"></i>
-                                <p className="texto-usuario">
-                                  {nome_documento}
-                                </p>
-                              </a>
-                            )}
-                            {documento_anexo.indexOf(
-                              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                            ) > -1 && (
-                              <a
-                                href={documento_anexo}
-                                download={nome_documento}
-                                className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                              >
-                                <i className="far fa-file-excel download"></i>
-                                <p className="texto-usuario">
-                                  {nome_documento}
-                                </p>
-                              </a>
-                            )}
-                            {documento_anexo.indexOf("text/plain") > -1 && (
-                              <a
-                                href={documento_anexo}
-                                download={nome_documento}
-                                className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                              >
-                                <i className="far fa-file-lines download"></i>
-                                <p className="texto-usuario">
-                                  {nome_documento}
-                                </p>
-                              </a>
-                            )}
-                          </>
-                        )}
-                      </div>
+                      {documento_anexo ? (
+                        <div className="d-flex">
+                          {documento_anexo && (
+                            <>
+                              {documento_anexo.indexOf("image/") > -1 && (
+                                <a
+                                  href={documento_anexo}
+                                  download={nome_documento}
+                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                >
+                                  <i className="far fa-file-image download"></i>
+                                  <p className="texto-usuario">
+                                    {nome_documento}
+                                  </p>
+                                </a>
+                              )}
+                              {documento_anexo.indexOf("application/pdf") >
+                                -1 && (
+                                <a
+                                  href={documento_anexo}
+                                  download={nome_documento}
+                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                >
+                                  <i className="far fa-file-pdf download"></i>
+                                  <p className="texto-usuario">
+                                    {nome_documento}
+                                  </p>
+                                </a>
+                              )}
+                              {documento_anexo.indexOf("application/msword") >
+                                -1 && (
+                                <a
+                                  href={documento_anexo}
+                                  download={nome_documento}
+                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                >
+                                  <i className="far fa-file-word download"></i>
+                                  <p className="texto-usuario">
+                                    {nome_documento}
+                                  </p>
+                                </a>
+                              )}
+                              {documento_anexo.indexOf(
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                              ) > -1 && (
+                                <a
+                                  href={documento_anexo}
+                                  download={nome_documento}
+                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                >
+                                  <i className="far fa-file-excel download"></i>
+                                  <p className="texto-usuario">
+                                    {nome_documento}
+                                  </p>
+                                </a>
+                              )}
+                              {documento_anexo.indexOf("text/plain") > -1 && (
+                                <a
+                                  href={documento_anexo}
+                                  download={nome_documento}
+                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                >
+                                  <i className="far fa-file-lines download"></i>
+                                  <p className="texto-usuario">
+                                    {nome_documento}
+                                  </p>
+                                </a>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="texto-usuario text-center">
+                          Nenhum anexo para esta CRM
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -907,13 +929,13 @@ const Accordion: React.FC<DadosCRM> = ({
                       </Modal>
                     </div>
 
-                    <div className="texto-usuario ps-3">
+                    <div className="texto-usuario">
                       {alternativas ? (
                         <>
                           <h6 className="pt-3">Alternativas:</h6>
                           {alternativas.length > 680 ? (
                             <>
-                              {alternativasFormatado}
+                              <p className="ps-3">{alternativasFormatado}</p>
                               <button
                                 className="botao-arquivos ver-mais ps-1"
                                 onClick={handleShowAlternativas}
@@ -922,7 +944,9 @@ const Accordion: React.FC<DadosCRM> = ({
                               </button>
                             </>
                           ) : (
-                            <>{alternativas}</>
+                            <>
+                              <p className="ps-3">{alternativas}</p>
+                            </>
                           )}
                         </>
                       ) : null}
@@ -1012,43 +1036,110 @@ const Accordion: React.FC<DadosCRM> = ({
                       </div>
                     </>
                   ) : null}
-                  <h6 className="pt-3">Complexidade:</h6>
-                  <div className="texto-usuario d-flex justify-content-end">
-                    {switchComplexidade(complexidade)}
-                  </div>
-                  {impacto_ti ? (
+                  {complexidade === 0 && setorUsuario === "TI" ? (
                     <>
-                      <h6 className="pt-3">Impacto da mudança:</h6>
-                      {impacto_ti.length > 200 ? (
-                        <div className="texto-usuario text-end">
-                          {impactoTIFormatado}
-                          <button
-                            className="botao-arquivos ver-mais ps-1"
-                            onClick={handleShowImpactoTI}
+                      <form>
+                        <h6 className="pt-3">Complexidade:</h6>
+                        <div className="d-flex justify-content-end">
+                          <select
+                            name="complexidade"
+                            id="complexidade"
+                            className="text-center"
+                            onChange={(e) =>
+                              setComplexidadeUpdate(Number(e.target.value))
+                            }
                           >
-                            ver mais...
+                            <option
+                              className="zero"
+                              value="0"
+                              disabled
+                              selected
+                            >
+                              . . .
+                            </option>
+                            <option className="muito-baixa" value="1">
+                              MUITO BAIXA
+                            </option>
+                            <option className="baixa" value="2">
+                              BAIXA
+                            </option>
+                            <option className="media" value="3">
+                              MÉDIA
+                            </option>
+                            <option className="alta" value="4">
+                              ALTA
+                            </option>
+                            <option className="muito-alta" value="5">
+                              MUITO ALTA
+                            </option>
+                          </select>
+                        </div>
+                        <label htmlFor="impacto_ti">Impacto da mudança:</label>
+                        <textarea
+                          name="impacto_ti"
+                          id=""
+                          className="input-impacto_ti texto-usuario"
+                          value={impactoTI}
+                          onChange={(e) => setImpactoTI(e.target.value)}
+                        />
+                        <div className="d-flex justify-content-end">
+                          <button
+                            className="salvar_ti ps-3 pe-3"
+                            onClick={salvarDetalhesTI}
+                          >
+                            Salvar
                           </button>
                         </div>
-                      ) : (
-                        <>{impacto_ti}</>
-                      )}
+                      </form>
                     </>
-                  ) : null}
-                  <Modal
-                    size="xl"
-                    show={showImpactoTI}
-                    onHide={handleCloseImpactoTI}
-                  >
-                    <Modal.Header closeButton>
-                      <Modal.Title>Impacto da mudança:</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>{impacto_ti}</Modal.Body>
-                    <Modal.Footer>
-                      <Button variant="warning" onClick={handleCloseImpactoTI}>
-                        OK
-                      </Button>
-                    </Modal.Footer>
-                  </Modal>
+                  ) : (
+                    <>
+                      <h6 className="pt-3">Complexidade:</h6>
+                      <div className="texto-usuario d-flex justify-content-end">
+                        {switchComplexidade(complexidade)}
+                      </div>
+                      {impacto_ti ? (
+                        <>
+                          <h6 className="pt-3">Impacto da mudança:</h6>
+                          {impacto_ti.length > 200 ? (
+                            <div className="texto-usuario text-end">
+                              {impactoTIFormatado}
+                              <button
+                                className="botao-arquivos ver-mais ps-1"
+                                onClick={handleShowImpactoTI}
+                              >
+                                ver mais...
+                              </button>
+                              <Modal
+                                size="xl"
+                                show={showImpactoTI}
+                                onHide={handleCloseImpactoTI}
+                              >
+                                <Modal.Header closeButton>
+                                  <Modal.Title>Impacto da mudança:</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>{impacto_ti}</Modal.Body>
+                                <Modal.Footer>
+                                  <Button
+                                    variant="warning"
+                                    onClick={handleCloseImpactoTI}
+                                  >
+                                    OK
+                                  </Button>
+                                </Modal.Footer>
+                              </Modal>
+                            </div>
+                          ) : (
+                            <>
+                              <p className="texto-usuario text-end">
+                                {impacto_ti}
+                              </p>
+                            </>
+                          )}
+                        </>
+                      ) : null}
+                    </>
+                  )}
                   {data_arquivamento ? (
                     <>
                       <h6 className="pt-3">Data Arquivamento:</h6>

@@ -35,6 +35,12 @@ const AccordionStyled = styled.section<Props>`
     color: #f12b2c;
   }
 
+  .reject-status {
+    font-size: 1.8rem;
+    text-align: center;
+    color: #f12b2c;
+  }
+
   .div-reject {
     border: none;
     outline: none;
@@ -53,6 +59,14 @@ const AccordionStyled = styled.section<Props>`
     text-align: center;
     color: #fec400;
     position: relative;
+  }
+
+  .pending-setor-dots {
+    color: #dfe0eb;
+  }
+
+  .pending-status-dots {
+    color: #fff;
   }
 
   .fa-ellipsis {
@@ -97,14 +111,6 @@ const AccordionStyled = styled.section<Props>`
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-
-  .pending-setor-dots {
-    color: #dfe0eb;
-  }
-
-  .pending-status-dots {
-    color: #fff;
   }
 
   .complexidade-alta {
@@ -185,6 +191,47 @@ const AccordionStyled = styled.section<Props>`
     border-radius: 1rem;
   }
 
+  .zero {
+    background-color: #c4c4c4;
+    font-weight: 900;
+  }
+
+  .muito-baixa {
+    background-color: #2b7af1;
+    color: #fff;
+  }
+
+  .baixa {
+    background-color: #3dc764;
+    color: #fff;
+  }
+
+  .media {
+    background-color: #fec400;
+    color: #fff;
+  }
+
+  .alta {
+    background-color: #f12b2c;
+    color: #fff;
+  }
+
+  .muito-alta {
+    background-color: #2c2c2c;
+    color: #fff;
+  }
+
+  select {
+    border-radius: 1rem;
+    width: 7rem;
+    height: 1.4rem;
+    color: #000;
+    font-size: 0.8rem;
+    font-weight: 700;
+    outline: none;
+    border: none;
+  }
+
   .texto-usuario {
     font-size: 0.8rem;
     font-weight: 400;
@@ -196,6 +243,40 @@ const AccordionStyled = styled.section<Props>`
     border: none;
     outline: none;
     background-color: transparent;
+  }
+
+  .input-impacto_ti {
+    background-color: #fff;
+  }
+
+  .input-impacto_ti::-webkit-scrollbar {
+    width: 0.7rem;
+  }
+
+  .input-impacto_ti::-webkit-scrollbar-track {
+    border-radius: 0.8rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .input-impacto_ti::-webkit-scrollbar-thumb {
+    background: rgba(33, 104, 0, 0.4);
+    border-radius: 1rem;
+  }
+
+  .input-impacto_ti::-webkit-scrollbar-thumb:hover {
+    background: rgba(33, 104, 0, 0.7);
+  }
+
+  .salvar_ti {
+    background-color: #fde900;
+    box-shadow: 0px 4px 12px rgba(55, 81, 255, 0.24);
+    border-radius: 0.8rem;
+    border: none;
+    font-weight: 900;
+    color: #ffffff;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    width: auto;
   }
 
   .ver-mais {

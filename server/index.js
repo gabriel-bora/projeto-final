@@ -250,9 +250,36 @@ app.get("/getAllCRMs", (req, res) => {
     });
 });
 
-app.get("/getAllSetores", (req, res) => {
-  sequelize.query("SELECT * FROM Setores").then((data) => {
-    res.send(data);
+app.post("/updateCRM", (req, res) => {
+  CRM.update(
+    {
+      data_arquivamento: req.body.data_arquivamento,
+    },
+    {
+      where: {
+        id: req.body.id,
+        versao_crm: req.body.versao_crm,
+      },
+    }
+  ).then(() => {
+    res.send(`CRM arquivada!`);
+  });
+});
+
+app.post("/updateCRM_TI", (req, res) => {
+  CRM.update(
+    {
+      complexidade: req.body.complexidade,
+      impacto_ti: req.body.impacto_ti,
+    },
+    {
+      where: {
+        id: req.body.id,
+        versao_crm: req.body.versao_crm,
+      },
+    }
+  ).then(() => {
+    res.send(`CRM atualizada`);
   });
 });
 
