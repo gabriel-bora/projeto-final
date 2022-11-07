@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "/projeto-final-crm/static/css/main.85768c17.css",
+    "main.js": "/projeto-final-crm/static/js/main.914bc83a.js",
+    "static/media/fundo-index.jpg": "/projeto-final-crm/static/media/fundo-index.ae563237060d6aa95605.jpg",
+    "static/media/logo-quero-quero.png": "/projeto-final-crm/static/media/logo-quero-quero.18cae747d443486eed53.png",
+    "static/media/colaborador.png": "/projeto-final-crm/static/media/colaborador.beeed44fa71eb2cc4fa0.png",
+    "static/media/usuario.png": "/projeto-final-crm/static/media/usuario.94d96c6c71f69c5d1a3e.png",
+    "static/media/usuario-2.png": "/projeto-final-crm/static/media/usuario-2.7485d9b99d0f76191885.png",
+    "static/media/colaborador-2.png": "/projeto-final-crm/static/media/colaborador-2.0c03112ca35ca5e27d8a.png",
+    "index.html": "/projeto-final-crm/index.html",
+    "main.85768c17.css.map": "/projeto-final-crm/static/css/main.85768c17.css.map",
+    "main.914bc83a.js.map": "/projeto-final-crm/static/js/main.914bc83a.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.85768c17.css",
+    "static/js/main.914bc83a.js"
+  ]
+}
