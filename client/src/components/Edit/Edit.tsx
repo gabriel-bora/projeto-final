@@ -205,7 +205,7 @@ const Edit: React.FC = () => {
   const [comportamento_offline, setComportamento_offline] = useState<string>();
   const [dependencia_outro_crm, setDependendia_outro_crm] = useState<string>();
   const [numero_crm_dependencia, setNumero_dependencia_crm] =
-    useState<string>();
+    useState<number>();
   const [documento_anexo, setDocumento_anexo] = useState<string>();
   const [nomedocumento, setNomedocumento] = useState<string>();
 
@@ -621,7 +621,9 @@ const Edit: React.FC = () => {
                     id=""
                     className="input-data-legal"
                     value={numero_crm_dependencia}
-                    onChange={(e) => setNumero_dependencia_crm(e.target.value)}
+                    onChange={(e) =>
+                      setNumero_dependencia_crm(Number(e.target.value))
+                    }
                   />
                 </div>
               ) : null}
