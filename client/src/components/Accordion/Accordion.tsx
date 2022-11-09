@@ -212,7 +212,7 @@ const Accordion: React.FC<DadosCRM> = ({
 
   function rejeitar(e: any) {
     e.preventDefault();
-    if (justificativaRejeitar === undefined) {
+    if (justificativaRejeitar === undefined || justificativaRejeitar === "") {
       window.alert("Para rejeitar é necessário uma justificativa");
       return;
     } else {
@@ -251,14 +251,6 @@ const Accordion: React.FC<DadosCRM> = ({
   let diferenca = listaSetores.filter(function (element, index, array) {
     if (listaSetoresAceite.indexOf(element) == -1) return element;
   });
-  let status: string = "";
-  if (diferenca.length === 0 && listaAceites1.some((v) => v.aceite === "nao")) {
-    status = "rejeitada";
-  } else if (diferenca.length === 0) {
-    status = "arquivada";
-  } else {
-    status = "pendente";
-  }
 
   const arquivar = () => {
     axios
@@ -299,6 +291,8 @@ const Accordion: React.FC<DadosCRM> = ({
     window.location.reload();
   };
 
+  const [versaoMaxima, setVersaoMaxima] = useState<number>();
+
   useEffect(() => {
     let usuario = localStorage.getItem("usuario-logado");
     axios
@@ -319,7 +313,26 @@ const Accordion: React.FC<DadosCRM> = ({
       .then((response: any) => {
         setListaAceites(response.data);
       });
+    axios
+      .post("http://localhost:3001/getMaxVersion", {
+        id: id,
+      })
+      .then((response: any) => {
+        setVersaoMaxima(response.data[0][0].valor);
+      });
   }, []);
+
+  let status: string = "";
+  if (
+    (diferenca.length === 0 && listaAceites1.some((v) => v.aceite === "nao")) ||
+    versaoMaxima! > versao_crm
+  ) {
+    status = "rejeitada";
+  } else if (diferenca.length === 0) {
+    status = "arquivada";
+  } else {
+    status = "pendente";
+  }
 
   function switchComplexidade(valor: number) {
     switch (valor) {
@@ -464,7 +477,8 @@ const Accordion: React.FC<DadosCRM> = ({
                 </div>
                 <div className="col-2 d-flex justify-content-center">
                   {setorUsuario === colaborador_setor &&
-                  data_arquivamento === null ? (
+                  data_arquivamento === null &&
+                  versaoMaxima == versao_crm ? (
                     <button
                       className="botao-editar botao-editar-habilitado"
                       onClick={editar_crm}
@@ -574,249 +588,274 @@ const Accordion: React.FC<DadosCRM> = ({
                           </>
                         ) : (
                           <>
-                            {value == setorUsuario ? (
+                            {versaoMaxima! == versao_crm ? (
                               <>
-                                <h6 className="ps-3 pt-2">{value}:</h6>
-                                <div className="ps-3 d-flex justify-content-center">
-                                  <div className="pt-2 mb-2 d-flex">
-                                    <button
-                                      className="div-reject"
-                                      onClick={aceitar}
-                                    >
-                                      <i className="fa-solid fa-circle-check check-setor"></i>
-                                    </button>
-                                    <button
-                                      className="div-reject ms-4"
-                                      onClick={handleShowRejeitar}
-                                    >
-                                      <i className="fa-solid fa-times-circle reject-setor"></i>
-                                    </button>
-                                    <Modal
-                                      size="lg"
-                                      show={showRejeitar}
-                                      onHide={handleCloseRejeitar}
-                                    >
-                                      <Modal.Header closeButton>
-                                        <Modal.Title>
-                                          Justificativa rejeição setor {value}:
-                                        </Modal.Title>
-                                      </Modal.Header>
-                                      <form>
-                                        <Modal.Body>
-                                          <label
-                                            htmlFor="justificativa"
-                                            className="pt-3"
-                                          >
-                                            Justificativa:
-                                          </label>
-                                          <textarea
-                                            id=""
-                                            name="justificativa"
-                                            className="input-objetivo"
-                                            value={justificativaRejeitar}
-                                            onChange={(e) =>
-                                              setJustificativaRejeitar(
-                                                e.target.value
-                                              )
-                                            }
-                                            required
-                                          />
-                                          <label
-                                            className="mt-3"
-                                            htmlFor="documentos"
-                                          >
-                                            Documentos:
-                                          </label>
-                                          <div className="input-documentos d-flex">
-                                            {documento_anexoRejeitar.length >
-                                            0 ? (
-                                              <>
-                                                {documento_anexoRejeitar.map(
-                                                  (value, index) => (
-                                                    <>
-                                                      {value.indexOf("image/") >
-                                                      -1 ? (
-                                                        <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                          <i className="far fa-file-image download position-relative">
-                                                            <button
-                                                              onClick={(e) =>
-                                                                excluir_arquivo(
-                                                                  index,
-                                                                  e
-                                                                )
-                                                              }
-                                                              className="botao-excluir-arquivo"
-                                                            >
-                                                              <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                                                            </button>
-                                                          </i>
-                                                          <p className="texto-usuario">
-                                                            {
-                                                              nomedocumentoRejeitar[
-                                                                index
-                                                              ]
-                                                            }
-                                                          </p>
-                                                        </div>
-                                                      ) : null}
-                                                      {value.indexOf(
-                                                        "application/pdf"
-                                                      ) > -1 ? (
-                                                        <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                          <i className="far fa-file-pdf download position-relative">
-                                                            <button
-                                                              onClick={(e) =>
-                                                                excluir_arquivo(
-                                                                  index,
-                                                                  e
-                                                                )
-                                                              }
-                                                              className="botao-excluir-arquivo"
-                                                            >
-                                                              <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                                                            </button>
-                                                          </i>
-                                                          <p className="texto-usuario">
-                                                            {
-                                                              nomedocumentoRejeitar[
-                                                                index
-                                                              ]
-                                                            }
-                                                          </p>
-                                                        </div>
-                                                      ) : null}
-                                                      {value.indexOf(
-                                                        "application/msword"
-                                                      ) > -1 ? (
-                                                        <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                          <i className="far fa-file-word download position-relative">
-                                                            <button
-                                                              onClick={(e) =>
-                                                                excluir_arquivo(
-                                                                  index,
-                                                                  e
-                                                                )
-                                                              }
-                                                              className="botao-excluir-arquivo"
-                                                            >
-                                                              <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                                                            </button>
-                                                          </i>
-                                                          <p className="texto-usuario">
-                                                            {
-                                                              nomedocumentoRejeitar[
-                                                                index
-                                                              ]
-                                                            }
-                                                          </p>
-                                                        </div>
-                                                      ) : null}
-                                                      {value.indexOf(
-                                                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                                      ) > -1 ? (
-                                                        <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                          <i className="far fa-file-excel download position-relative">
-                                                            <button
-                                                              onClick={(e) =>
-                                                                excluir_arquivo(
-                                                                  index,
-                                                                  e
-                                                                )
-                                                              }
-                                                              className="botao-excluir-arquivo"
-                                                            >
-                                                              <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                                                            </button>
-                                                          </i>
-                                                          <p className="texto-usuario">
-                                                            {
-                                                              nomedocumentoRejeitar[
-                                                                index
-                                                              ]
-                                                            }
-                                                          </p>
-                                                        </div>
-                                                      ) : null}
-                                                      {value.indexOf(
-                                                        "text/plain"
-                                                      ) > -1 ? (
-                                                        <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                          <i className="far fa-file-lines download position-relative">
-                                                            <button
-                                                              onClick={(e) =>
-                                                                excluir_arquivo(
-                                                                  index,
-                                                                  e
-                                                                )
-                                                              }
-                                                              className="botao-excluir-arquivo"
-                                                            >
-                                                              <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                                                            </button>
-                                                          </i>
-                                                          <p className="texto-usuario">
-                                                            {
-                                                              nomedocumentoRejeitar[
-                                                                index
-                                                              ]
-                                                            }
-                                                          </p>
-                                                        </div>
-                                                      ) : null}
-                                                    </>
+                                {value == setorUsuario ? (
+                                  <>
+                                    <h6 className="ps-3 pt-2">{value}:</h6>
+                                    <div className="ps-3 d-flex justify-content-center">
+                                      <div className="pt-2 mb-2 d-flex">
+                                        <button
+                                          className="div-reject"
+                                          onClick={aceitar}
+                                        >
+                                          <i className="fa-solid fa-circle-check check-setor"></i>
+                                        </button>
+                                        <button
+                                          className="div-reject ms-4"
+                                          onClick={handleShowRejeitar}
+                                        >
+                                          <i className="fa-solid fa-times-circle reject-setor"></i>
+                                        </button>
+                                        <Modal
+                                          size="lg"
+                                          show={showRejeitar}
+                                          onHide={handleCloseRejeitar}
+                                        >
+                                          <Modal.Header closeButton>
+                                            <Modal.Title>
+                                              Justificativa rejeição setor{" "}
+                                              {value}:
+                                            </Modal.Title>
+                                          </Modal.Header>
+                                          <form>
+                                            <Modal.Body>
+                                              <label
+                                                htmlFor="justificativa"
+                                                className="pt-3"
+                                              >
+                                                Justificativa:
+                                              </label>
+                                              <textarea
+                                                id=""
+                                                name="justificativa"
+                                                className="input-objetivo"
+                                                value={justificativaRejeitar}
+                                                onChange={(e) =>
+                                                  setJustificativaRejeitar(
+                                                    e.target.value
                                                   )
-                                                )}
-                                              </>
-                                            ) : null}
-                                          </div>
-                                          <br />
-                                          <label
-                                            htmlFor=""
-                                            className="anexar ms-3"
-                                          >
-                                            <i className="fa-solid fa-upload"></i>
-                                            Anexar documentos
-                                            <input
-                                              type="file"
-                                              name=""
-                                              id=""
-                                              onChange={(e) =>
-                                                convertFile(
-                                                  e.target.files,
-                                                  e.target.value
-                                                )
-                                              }
-                                            />
-                                          </label>
-                                        </Modal.Body>
-                                        <Modal.Footer>
-                                          <Button
-                                            variant="secondary"
-                                            onClick={handleCloseRejeitar}
-                                          >
-                                            Cancelar
-                                          </Button>
-                                          <Button
-                                            type="submit"
-                                            variant="warning"
-                                            onClick={rejeitar}
-                                          >
-                                            Salvar
-                                          </Button>
-                                        </Modal.Footer>
-                                      </form>
-                                    </Modal>
-                                  </div>
-                                </div>
+                                                }
+                                                required
+                                              />
+                                              <label
+                                                className="mt-3"
+                                                htmlFor="documentos"
+                                              >
+                                                Documentos:
+                                              </label>
+                                              <div className="input-documentos d-flex">
+                                                {documento_anexoRejeitar.length >
+                                                0 ? (
+                                                  <>
+                                                    {documento_anexoRejeitar.map(
+                                                      (value, index) => (
+                                                        <>
+                                                          {value.indexOf(
+                                                            "image/"
+                                                          ) > -1 ? (
+                                                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                              <i className="far fa-file-image download position-relative">
+                                                                <button
+                                                                  onClick={(
+                                                                    e
+                                                                  ) =>
+                                                                    excluir_arquivo(
+                                                                      index,
+                                                                      e
+                                                                    )
+                                                                  }
+                                                                  className="botao-excluir-arquivo"
+                                                                >
+                                                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                                </button>
+                                                              </i>
+                                                              <p className="texto-usuario">
+                                                                {
+                                                                  nomedocumentoRejeitar[
+                                                                    index
+                                                                  ]
+                                                                }
+                                                              </p>
+                                                            </div>
+                                                          ) : null}
+                                                          {value.indexOf(
+                                                            "application/pdf"
+                                                          ) > -1 ? (
+                                                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                              <i className="far fa-file-pdf download position-relative">
+                                                                <button
+                                                                  onClick={(
+                                                                    e
+                                                                  ) =>
+                                                                    excluir_arquivo(
+                                                                      index,
+                                                                      e
+                                                                    )
+                                                                  }
+                                                                  className="botao-excluir-arquivo"
+                                                                >
+                                                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                                </button>
+                                                              </i>
+                                                              <p className="texto-usuario">
+                                                                {
+                                                                  nomedocumentoRejeitar[
+                                                                    index
+                                                                  ]
+                                                                }
+                                                              </p>
+                                                            </div>
+                                                          ) : null}
+                                                          {value.indexOf(
+                                                            "application/msword"
+                                                          ) > -1 ? (
+                                                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                              <i className="far fa-file-word download position-relative">
+                                                                <button
+                                                                  onClick={(
+                                                                    e
+                                                                  ) =>
+                                                                    excluir_arquivo(
+                                                                      index,
+                                                                      e
+                                                                    )
+                                                                  }
+                                                                  className="botao-excluir-arquivo"
+                                                                >
+                                                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                                </button>
+                                                              </i>
+                                                              <p className="texto-usuario">
+                                                                {
+                                                                  nomedocumentoRejeitar[
+                                                                    index
+                                                                  ]
+                                                                }
+                                                              </p>
+                                                            </div>
+                                                          ) : null}
+                                                          {value.indexOf(
+                                                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                          ) > -1 ? (
+                                                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                              <i className="far fa-file-excel download position-relative">
+                                                                <button
+                                                                  onClick={(
+                                                                    e
+                                                                  ) =>
+                                                                    excluir_arquivo(
+                                                                      index,
+                                                                      e
+                                                                    )
+                                                                  }
+                                                                  className="botao-excluir-arquivo"
+                                                                >
+                                                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                                </button>
+                                                              </i>
+                                                              <p className="texto-usuario">
+                                                                {
+                                                                  nomedocumentoRejeitar[
+                                                                    index
+                                                                  ]
+                                                                }
+                                                              </p>
+                                                            </div>
+                                                          ) : null}
+                                                          {value.indexOf(
+                                                            "text/plain"
+                                                          ) > -1 ? (
+                                                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                              <i className="far fa-file-lines download position-relative">
+                                                                <button
+                                                                  onClick={(
+                                                                    e
+                                                                  ) =>
+                                                                    excluir_arquivo(
+                                                                      index,
+                                                                      e
+                                                                    )
+                                                                  }
+                                                                  className="botao-excluir-arquivo"
+                                                                >
+                                                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                                </button>
+                                                              </i>
+                                                              <p className="texto-usuario">
+                                                                {
+                                                                  nomedocumentoRejeitar[
+                                                                    index
+                                                                  ]
+                                                                }
+                                                              </p>
+                                                            </div>
+                                                          ) : null}
+                                                        </>
+                                                      )
+                                                    )}
+                                                  </>
+                                                ) : null}
+                                              </div>
+                                              <br />
+                                              <label
+                                                htmlFor=""
+                                                className="anexar ms-3"
+                                              >
+                                                <i className="fa-solid fa-upload"></i>
+                                                Anexar documentos
+                                                <input
+                                                  type="file"
+                                                  name=""
+                                                  id=""
+                                                  onChange={(e) =>
+                                                    convertFile(
+                                                      e.target.files,
+                                                      e.target.value
+                                                    )
+                                                  }
+                                                />
+                                              </label>
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                              <Button
+                                                variant="secondary"
+                                                onClick={handleCloseRejeitar}
+                                              >
+                                                Cancelar
+                                              </Button>
+                                              <Button
+                                                type="submit"
+                                                variant="warning"
+                                                onClick={rejeitar}
+                                              >
+                                                Salvar
+                                              </Button>
+                                            </Modal.Footer>
+                                          </form>
+                                        </Modal>
+                                      </div>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <h6 className="ps-3 pt-2">{value}:</h6>
+                                    <div className="ps-3 d-flex justify-content-center">
+                                      <div className="pt-2 mb-2 d-flex">
+                                        <i className="fa-solid fa-circle pending-setor">
+                                          <i className="fa-solid fa-ellipsis pending-setor-dots"></i>
+                                        </i>
+                                      </div>
+                                    </div>
+                                  </>
+                                )}
                               </>
                             ) : (
                               <>
                                 <h6 className="ps-3 pt-2">{value}:</h6>
                                 <div className="ps-3 d-flex justify-content-center">
                                   <div className="pt-2 mb-2 d-flex">
-                                    <i className="fa-solid fa-circle pending-setor">
-                                      <i className="fa-solid fa-ellipsis pending-setor-dots"></i>
-                                    </i>
+                                    <i className="fa-solid fa-times-circle reject-setor"></i>
                                   </div>
                                 </div>
                               </>

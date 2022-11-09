@@ -242,6 +242,16 @@ app.get("/getMaxCRM", (req, res) => {
   });
 });
 
+app.post("/getMaxVersion", (req, res) => {
+  sequelize
+    .query(
+      `SELECT MAX(versao_crm) AS 'valor' FROM CRMs WHERE id = ${req.body.id}`
+    )
+    .then((data) => {
+      res.send(data);
+    });
+});
+
 app.get("/getAllCRMs", (req, res) => {
   sequelize
     .query(

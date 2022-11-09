@@ -28,6 +28,9 @@ const User: React.FC = () => {
         setSenha(response.data.senha);
         setFoto(response.data.foto_perfil);
       });
+    localStorage.removeItem("pesquisa");
+    localStorage.removeItem("data-arq");
+    localStorage.removeItem("data-inicio");
   }, []);
 
   function atualizar_usuario(e: any) {

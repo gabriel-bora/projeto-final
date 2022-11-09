@@ -12,6 +12,9 @@ const Dashboard: React.FC = () => {
     axios.get("http://localhost:3001/getAllCRMs").then((response) => {
       setListCRMs(response.data[0]);
     });
+    localStorage.removeItem("pesquisa");
+    localStorage.removeItem("data-arq");
+    localStorage.removeItem("data-inicio");
   }, []);
 
   let lista: any[] = [];

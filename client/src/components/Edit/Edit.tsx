@@ -278,37 +278,53 @@ const Edit: React.FC = () => {
 
   function criarCRM(e: any) {
     e.preventDefault();
-    let listaSetoresCheck: any = [];
-    valor.map((value) => {
-      listaSetoresCheck.push(value.setor);
-    });
-    axios
-      .post("http://localhost:3001/createCRM", {
-        id: idCRM,
-        versao_crm: versao,
-        colaborador_setor: setor,
-        colaborador_id: id,
-        descricao: descricao,
-        necessidade: necessidade,
-        impacto: impacto,
-        objetivo: objetivo,
-        justificativa: justificativa,
-        alternativas: alternativa,
-        data_obrigatoriedade: data_obrigatoriedade,
-        complexidade: complexidade,
-        setores_envolvidos: JSON.stringify(listaSetoresCheck),
-        sistemas_envolvidos: JSON.stringify(sistemas_envolvidos),
-        comportamento_offline: comportamento_offline,
-        dependencia_outro_crm: dependencia_outro_crm,
-        numero_crm_dependencia: numero_crm_dependencia,
-        documento_anexo: JSON.stringify(documento_anexo),
-        nome_documento: JSON.stringify(nomedocumento),
-        data_inicio: today,
-      })
-      .then((response) => {
-        alert(response.data);
-        navigate("/home");
+    if (
+      necessidade === "" ||
+      impacto === "" ||
+      necessidade === "" ||
+      descricao === "" ||
+      objetivo === "" ||
+      justificativa === ""
+    ) {
+      window.alert(
+        "Verifique se todos os campos necessários estão preenchidos"
+      );
+      return;
+    } else {
+      let listaSetoresCheck: any = [];
+      valor.map((value) => {
+        listaSetoresCheck.push(value.setor);
       });
+      axios
+        .post("http://localhost:3001/createCRM", {
+          id: idCRM,
+          versao_crm: versao,
+          colaborador_setor: setor,
+          colaborador_id: id,
+          descricao: descricao,
+          necessidade: necessidade,
+          impacto: impacto,
+          objetivo: objetivo,
+          justificativa: justificativa,
+          alternativas: alternativa,
+          data_obrigatoriedade: data_obrigatoriedade,
+          complexidade: complexidade,
+          setores_envolvidos: JSON.stringify(listaSetoresCheck),
+          sistemas_envolvidos: JSON.stringify(sistemas_envolvidos),
+          comportamento_offline: comportamento_offline,
+          dependencia_outro_crm: dependencia_outro_crm,
+          numero_crm_dependencia: numero_crm_dependencia,
+          documento_anexo: JSON.stringify(documento_anexo),
+          nome_documento: JSON.stringify(nomedocumento),
+          data_inicio: today,
+        })
+        .then((response) => {
+          alert(response.data);
+          localStorage.removeItem("versao-crm");
+          localStorage.removeItem("id-crm");
+          navigate("/home");
+        });
+    }
   }
 
   let setores: FilmOptionType[] = [listaSetores[0], listaSetores[5]];

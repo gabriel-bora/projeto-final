@@ -207,8 +207,7 @@ const Form: React.FC = () => {
   const [complexidade, setComplexidade] = useState(0);
   const [sistemas_envolvidos, setSistemas_envolvidos] = useState<string[]>([]);
   const [comportamento_offline, setComportamento_offline] = useState<string>();
-  const [dependencia_outro_crm, setDependendia_outro_crm] =
-    useState<string>("nao");
+  const [dependencia_outro_crm, setDependendia_outro_crm] = useState<string>();
   const [numero_crm_dependencia, setNumero_dependencia_crm] =
     useState<string>();
   const [documento_anexo, setDocumento_anexo] = useState<string[]>([]);
@@ -255,37 +254,58 @@ const Form: React.FC = () => {
 
   function criarCRM(e: any) {
     e.preventDefault();
-    let listaSetoresCheck: any = [];
-    valor.map((value) => {
-      listaSetoresCheck.push(value.setor);
-    });
-    axios
-      .post("http://localhost:3001/createCRM", {
-        id: idCRM,
-        versao_crm: versao,
-        colaborador_setor: setor,
-        colaborador_id: id,
-        descricao: descricao,
-        necessidade: necessidade,
-        impacto: impacto,
-        objetivo: objetivo,
-        justificativa: justificativa,
-        alternativas: alternativa,
-        data_obrigatoriedade: data_obrigatoriedade,
-        complexidade: complexidade,
-        setores_envolvidos: JSON.stringify(listaSetoresCheck),
-        sistemas_envolvidos: JSON.stringify(sistemas_envolvidos),
-        comportamento_offline: comportamento_offline,
-        dependencia_outro_crm: dependencia_outro_crm,
-        numero_crm_dependencia: numero_crm_dependencia,
-        documento_anexo: JSON.stringify(documento_anexo),
-        nome_documento: JSON.stringify(nomedocumento),
-        data_inicio: today,
-      })
-      .then((response) => {
-        alert(response.data);
-        navigate("/home");
+    if (
+      necessidade === undefined ||
+      necessidade === "" ||
+      impacto === undefined ||
+      impacto === "" ||
+      necessidade === undefined ||
+      necessidade === "" ||
+      descricao === undefined ||
+      descricao === "" ||
+      objetivo === undefined ||
+      objetivo === "" ||
+      justificativa === undefined ||
+      justificativa === "" ||
+      dependencia_outro_crm === undefined
+    ) {
+      window.alert(
+        "Verifique se todos os campos necessários estão preenchidos"
+      );
+      return;
+    } else {
+      let listaSetoresCheck: any = [];
+      valor.map((value) => {
+        listaSetoresCheck.push(value.setor);
       });
+      axios
+        .post("http://localhost:3001/createCRM", {
+          id: idCRM,
+          versao_crm: versao,
+          colaborador_setor: setor,
+          colaborador_id: id,
+          descricao: descricao,
+          necessidade: necessidade,
+          impacto: impacto,
+          objetivo: objetivo,
+          justificativa: justificativa,
+          alternativas: alternativa,
+          data_obrigatoriedade: data_obrigatoriedade,
+          complexidade: complexidade,
+          setores_envolvidos: JSON.stringify(listaSetoresCheck),
+          sistemas_envolvidos: JSON.stringify(sistemas_envolvidos),
+          comportamento_offline: comportamento_offline,
+          dependencia_outro_crm: dependencia_outro_crm,
+          numero_crm_dependencia: numero_crm_dependencia,
+          documento_anexo: JSON.stringify(documento_anexo),
+          nome_documento: JSON.stringify(nomedocumento),
+          data_inicio: today,
+        })
+        .then((response) => {
+          alert(response.data);
+          navigate("/home");
+        });
+    }
   }
 
   const fixedOptions = [listaSetores[9]];
