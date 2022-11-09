@@ -4,12 +4,9 @@ import Accordion from "../Accordion/Accordion";
 import SearchStyled from "./SearchStyled";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import * as moment from "moment";
-import "moment/locale/pt-br";
 
 const Search: React.FC = () => {
   const [listCRMs, setListCRMs] = useState();
-  const moment = require("moment");
 
   useEffect(() => {
     let pesquisa = localStorage.getItem("pesquisa");
