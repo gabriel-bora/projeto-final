@@ -24,13 +24,20 @@ const Login: React.FC = () => {
         senha: senha,
       })
       .then((response) => {
-        if (response.data === "logado") {
-          localStorage.setItem("usuario-logado", matricula);
-          navigate("/home");
-        } else {
+        if (
+          response.data === "Senha incorreta!" ||
+          response.data === "Usuário não encontrado!"
+        ) {
           alert(response.data);
           setMatricula("");
           setSenha("");
+        } else {
+          localStorage.setItem("usuario-logado", matricula);
+          if (response.data.setor === "Sem setor") {
+            navigate("/edituser");
+          } else {
+            navigate("/home");
+          }
         }
       });
   }

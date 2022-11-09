@@ -31,6 +31,8 @@ const User: React.FC = () => {
     localStorage.removeItem("pesquisa");
     localStorage.removeItem("data-arq");
     localStorage.removeItem("data-inicio");
+    localStorage.removeItem("versao-crm");
+    localStorage.removeItem("id-crm");
   }, []);
 
   function atualizar_usuario(e: any) {

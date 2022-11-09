@@ -159,7 +159,7 @@ app.post("/login", (req, res) => {
         res.send("Usuário não encontrado!");
       } else {
         if (req.body.senha === data.senha) {
-          res.send("logado");
+          res.send(data);
         } else {
           res.send("Senha incorreta!");
         }

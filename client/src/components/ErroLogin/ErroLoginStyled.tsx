@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import fundo from "../../assets/fundo-index.jpg";
 
-const LoginStyled = styled.div`
+const ErroLoginStyled = styled.div`
   .fundo {
     margin: 0;
     padding: 0;
@@ -165,4 +165,4 @@ const LoginStyled = styled.div`
   }
 `;
 
-export default LoginStyled;
+export default ErroLoginStyled;
