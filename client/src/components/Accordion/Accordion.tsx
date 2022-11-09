@@ -12,6 +12,7 @@ import * as moment from "moment";
 import "moment/locale/pt-br";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Buffer } from "node:buffer";
 
 interface DadosCRM {
   id: number;
@@ -161,6 +162,16 @@ const Accordion: React.FC<DadosCRM> = ({
     listaSistemas = JSON.parse(sistemas_envolvidos);
   }
 
+  let listaArquivos: string[] = [];
+  if (documento_anexo !== null) {
+    listaArquivos = JSON.parse(documento_anexo);
+  }
+
+  let listaNomesArquivos: string[] = [];
+  if (nome_documento !== null) {
+    listaNomesArquivos = JSON.parse(nome_documento);
+  }
+
   const [idUsuario, setIdUsuario] = useState<string>();
   const [setorUsuario, setSetorUsuario] = useState<string>();
   const [nomeUsuario, setNomeUsuario] = useState<string>();
@@ -171,9 +182,12 @@ const Accordion: React.FC<DadosCRM> = ({
   const [listaAceites, setListaAceites] = useState();
 
   const [justificativaRejeitar, setJustificativaRejeitar] = useState<string>();
-  const [documento_anexoRejeitar, setDocumento_anexoRejeitar] =
-    useState<string>();
-  const [nomedocumentoRejeitar, setNomedocumentoRejeitar] = useState<string>();
+  const [documento_anexoRejeitar, setDocumento_anexoRejeitar] = useState<
+    string[]
+  >([]);
+  const [nomedocumentoRejeitar, setNomedocumentoRejeitar] = useState<string[]>(
+    []
+  );
 
   function convertFile(files: FileList | null, values: string | null) {
     if (files) {
@@ -184,13 +198,15 @@ const Accordion: React.FC<DadosCRM> = ({
       reader.onload = (ev: any) => {
         // convert it to base64
         setDocumento_anexoRejeitar(
-          `data:${fileType};base64,${btoa(ev.target.result)}`
+          documento_anexoRejeitar?.concat(
+            `data:${fileType};base64,${btoa(ev.target.result)}`
+          )
         );
       };
     }
     if (values) {
       var filename = values.replace(/^.*\\/, "");
-      setNomedocumentoRejeitar(filename);
+      setNomedocumentoRejeitar(nomedocumentoRejeitar?.concat(filename));
     }
   }
 
@@ -212,8 +228,8 @@ const Accordion: React.FC<DadosCRM> = ({
           crm_versao: versao_crm,
           aceite: "nao",
           justificativa: justificativaRejeitar,
-          documento_justificativa: documento_anexoRejeitar,
-          nome_documento_justificativa: nomedocumentoRejeitar,
+          documento_justificativa: JSON.stringify(documento_anexoRejeitar),
+          nome_documento_justificativa: JSON.stringify(nomedocumentoRejeitar),
         })
         .then((response) => {
           alert(response.data);
@@ -377,6 +393,16 @@ const Accordion: React.FC<DadosCRM> = ({
     } else {
       navigate("/searchcrm");
     }
+  }
+
+  function excluir_arquivo(i: number, e: any) {
+    e.preventDefault();
+    setDocumento_anexoRejeitar((prev) =>
+      prev.filter((item) => prev.indexOf(item) !== i)
+    );
+    setNomedocumentoRejeitar((prev) =>
+      prev.filter((item) => prev.indexOf(item) !== i)
+    );
   }
 
   return (
@@ -602,60 +628,146 @@ const Accordion: React.FC<DadosCRM> = ({
                                             Documentos:
                                           </label>
                                           <div className="input-documentos d-flex">
-                                            {documento_anexoRejeitar && (
+                                            {documento_anexoRejeitar.length >
+                                            0 ? (
                                               <>
-                                                {documento_anexoRejeitar.indexOf(
-                                                  "image/"
-                                                ) > -1 && (
-                                                  <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                    <i className="far fa-file-image download"></i>
-                                                    <p className="texto-usuario">
-                                                      {nomedocumentoRejeitar}
-                                                    </p>
-                                                  </div>
-                                                )}
-                                                {documento_anexoRejeitar.indexOf(
-                                                  "application/pdf"
-                                                ) > -1 && (
-                                                  <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                    <i className="far fa-file-pdf download"></i>
-                                                    <p className="texto-usuario">
-                                                      {nomedocumentoRejeitar}
-                                                    </p>
-                                                  </div>
-                                                )}
-                                                {documento_anexoRejeitar.indexOf(
-                                                  "application/msword"
-                                                ) > -1 && (
-                                                  <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                    <i className="far fa-file-word download"></i>
-                                                    <p className="texto-usuario">
-                                                      {nomedocumentoRejeitar}
-                                                    </p>
-                                                  </div>
-                                                )}
-                                                {documento_anexoRejeitar.indexOf(
-                                                  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                                ) > -1 && (
-                                                  <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                    <i className="far fa-file-excel download"></i>
-                                                    <p className="texto-usuario">
-                                                      {nomedocumentoRejeitar}
-                                                    </p>
-                                                  </div>
-                                                )}
-                                                {documento_anexoRejeitar.indexOf(
-                                                  "text/plain"
-                                                ) > -1 && (
-                                                  <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                    <i className="far fa-file-lines download"></i>
-                                                    <p className="texto-usuario">
-                                                      {nomedocumentoRejeitar}
-                                                    </p>
-                                                  </div>
+                                                {documento_anexoRejeitar.map(
+                                                  (value, index) => (
+                                                    <>
+                                                      {value.indexOf("image/") >
+                                                      -1 ? (
+                                                        <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                          <i className="far fa-file-image download position-relative">
+                                                            <button
+                                                              onClick={(e) =>
+                                                                excluir_arquivo(
+                                                                  index,
+                                                                  e
+                                                                )
+                                                              }
+                                                              className="botao-excluir-arquivo"
+                                                            >
+                                                              <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                            </button>
+                                                          </i>
+                                                          <p className="texto-usuario">
+                                                            {
+                                                              nomedocumentoRejeitar[
+                                                                index
+                                                              ]
+                                                            }
+                                                          </p>
+                                                        </div>
+                                                      ) : null}
+                                                      {value.indexOf(
+                                                        "application/pdf"
+                                                      ) > -1 ? (
+                                                        <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                          <i className="far fa-file-pdf download position-relative">
+                                                            <button
+                                                              onClick={(e) =>
+                                                                excluir_arquivo(
+                                                                  index,
+                                                                  e
+                                                                )
+                                                              }
+                                                              className="botao-excluir-arquivo"
+                                                            >
+                                                              <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                            </button>
+                                                          </i>
+                                                          <p className="texto-usuario">
+                                                            {
+                                                              nomedocumentoRejeitar[
+                                                                index
+                                                              ]
+                                                            }
+                                                          </p>
+                                                        </div>
+                                                      ) : null}
+                                                      {value.indexOf(
+                                                        "application/msword"
+                                                      ) > -1 ? (
+                                                        <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                          <i className="far fa-file-word download position-relative">
+                                                            <button
+                                                              onClick={(e) =>
+                                                                excluir_arquivo(
+                                                                  index,
+                                                                  e
+                                                                )
+                                                              }
+                                                              className="botao-excluir-arquivo"
+                                                            >
+                                                              <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                            </button>
+                                                          </i>
+                                                          <p className="texto-usuario">
+                                                            {
+                                                              nomedocumentoRejeitar[
+                                                                index
+                                                              ]
+                                                            }
+                                                          </p>
+                                                        </div>
+                                                      ) : null}
+                                                      {value.indexOf(
+                                                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                      ) > -1 ? (
+                                                        <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                          <i className="far fa-file-excel download position-relative">
+                                                            <button
+                                                              onClick={(e) =>
+                                                                excluir_arquivo(
+                                                                  index,
+                                                                  e
+                                                                )
+                                                              }
+                                                              className="botao-excluir-arquivo"
+                                                            >
+                                                              <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                            </button>
+                                                          </i>
+                                                          <p className="texto-usuario">
+                                                            {
+                                                              nomedocumentoRejeitar[
+                                                                index
+                                                              ]
+                                                            }
+                                                          </p>
+                                                        </div>
+                                                      ) : null}
+                                                      {value.indexOf(
+                                                        "text/plain"
+                                                      ) > -1 ? (
+                                                        <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                          <i className="far fa-file-lines download position-relative">
+                                                            <button
+                                                              onClick={(e) =>
+                                                                excluir_arquivo(
+                                                                  index,
+                                                                  e
+                                                                )
+                                                              }
+                                                              className="botao-excluir-arquivo"
+                                                            >
+                                                              <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                            </button>
+                                                          </i>
+                                                          <p className="texto-usuario">
+                                                            {
+                                                              nomedocumentoRejeitar[
+                                                                index
+                                                              ]
+                                                            }
+                                                          </p>
+                                                        </div>
+                                                      ) : null}
+                                                    </>
+                                                  )
                                                 )}
                                               </>
-                                            )}
+                                            ) : null}
                                           </div>
                                           <br />
                                           <label
@@ -727,76 +839,74 @@ const Accordion: React.FC<DadosCRM> = ({
                   <div>
                     <h6 className="pt-3">Documentos:</h6>
                     <div className="ms-3 documentos">
-                      {documento_anexo ? (
+                      {listaArquivos.length > 0 ? (
                         <div className="d-flex">
-                          {documento_anexo && (
+                          {listaArquivos.map((value, index) => (
                             <>
-                              {documento_anexo.indexOf("image/") > -1 && (
+                              {value.indexOf("image/") > -1 && (
                                 <a
-                                  href={documento_anexo}
-                                  download={nome_documento}
+                                  href={value}
+                                  download={listaNomesArquivos[index]}
                                   className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
                                 >
                                   <i className="far fa-file-image download"></i>
                                   <p className="texto-usuario">
-                                    {nome_documento}
+                                    {listaNomesArquivos[index]}
                                   </p>
                                 </a>
                               )}
-                              {documento_anexo.indexOf("application/pdf") >
-                                -1 && (
+                              {value.indexOf("application/pdf") > -1 && (
                                 <a
-                                  href={documento_anexo}
-                                  download={nome_documento}
+                                  href={value}
+                                  download={listaNomesArquivos[index]}
                                   className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
                                 >
                                   <i className="far fa-file-pdf download"></i>
                                   <p className="texto-usuario">
-                                    {nome_documento}
+                                    {listaNomesArquivos[index]}
                                   </p>
                                 </a>
                               )}
-                              {documento_anexo.indexOf("application/msword") >
-                                -1 && (
+                              {value.indexOf("application/msword") > -1 && (
                                 <a
-                                  href={documento_anexo}
-                                  download={nome_documento}
+                                  href={value}
+                                  download={listaNomesArquivos[index]}
                                   className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
                                 >
                                   <i className="far fa-file-word download"></i>
                                   <p className="texto-usuario">
-                                    {nome_documento}
+                                    {listaNomesArquivos[index]}
                                   </p>
                                 </a>
                               )}
-                              {documento_anexo.indexOf(
+                              {value.indexOf(
                                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                               ) > -1 && (
                                 <a
-                                  href={documento_anexo}
-                                  download={nome_documento}
+                                  href={value}
+                                  download={listaNomesArquivos[index]}
                                   className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
                                 >
                                   <i className="far fa-file-excel download"></i>
                                   <p className="texto-usuario">
-                                    {nome_documento}
+                                    {listaNomesArquivos[index]}
                                   </p>
                                 </a>
                               )}
-                              {documento_anexo.indexOf("text/plain") > -1 && (
+                              {value.indexOf("text/plain") > -1 && (
                                 <a
-                                  href={documento_anexo}
-                                  download={nome_documento}
+                                  href={value}
+                                  download={listaNomesArquivos[index]}
                                   className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
                                 >
                                   <i className="far fa-file-lines download"></i>
                                   <p className="texto-usuario">
-                                    {nome_documento}
+                                    {listaNomesArquivos[index]}
                                   </p>
                                 </a>
                               )}
                             </>
-                          )}
+                          ))}
                         </div>
                       ) : (
                         <p className="texto-usuario text-center">

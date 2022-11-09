@@ -68,7 +68,23 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .arquivos {
-    width: 12vw;
+    min-width: 12vw;
+  }
+
+  .botao-excluir-arquivo {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .excluir-arquivo {
+    position: absolute;
+    top: -1.5vh;
+    right: -1.5vh;
+    font-size: 1.2rem;
+    background-color: #fff;
+    color: #ff1b1b;
+    border-radius: 50%;
   }
 
   .anexar {

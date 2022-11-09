@@ -206,8 +206,8 @@ const Edit: React.FC = () => {
   const [dependencia_outro_crm, setDependendia_outro_crm] = useState<string>();
   const [numero_crm_dependencia, setNumero_dependencia_crm] =
     useState<number>();
-  const [documento_anexo, setDocumento_anexo] = useState<string>();
-  const [nomedocumento, setNomedocumento] = useState<string>();
+  const [documento_anexo, setDocumento_anexo] = useState<string[]>([]);
+  const [nomedocumento, setNomedocumento] = useState<string[]>([]);
 
   interface FilmOptionType {
     setor: string;
@@ -271,6 +271,8 @@ const Edit: React.FC = () => {
         setSistemas_envolvidos(JSON.parse(response.data.sistemas_envolvidos));
         setDependendia_outro_crm(response.data.dependencia_outro_crm);
         setNumero_dependencia_crm(response.data.numero_crm_dependencia);
+        setDocumento_anexo(JSON.parse(response.data.documento_anexo));
+        setNomedocumento(JSON.parse(response.data.nome_documento));
       });
   }, []);
 
@@ -299,8 +301,8 @@ const Edit: React.FC = () => {
         comportamento_offline: comportamento_offline,
         dependencia_outro_crm: dependencia_outro_crm,
         numero_crm_dependencia: numero_crm_dependencia,
-        documento_anexo: documento_anexo,
-        nome_documento: nomedocumento,
+        documento_anexo: JSON.stringify(documento_anexo),
+        nome_documento: JSON.stringify(nomedocumento),
         data_inicio: today,
       })
       .then((response) => {
@@ -351,13 +353,25 @@ const Edit: React.FC = () => {
       reader.readAsBinaryString(fileRef);
       reader.onload = (ev: any) => {
         // convert it to base64
-        setDocumento_anexo(`data:${fileType};base64,${btoa(ev.target.result)}`);
+        setDocumento_anexo(
+          documento_anexo?.concat(
+            `data:${fileType};base64,${btoa(ev.target.result)}`
+          )
+        );
       };
     }
     if (values) {
       var filename = values.replace(/^.*\\/, "");
-      setNomedocumento(filename);
+      setNomedocumento(nomedocumento?.concat(filename));
     }
+  }
+
+  function excluir_arquivo(i: number, e: any) {
+    e.preventDefault();
+    setDocumento_anexo((prev) =>
+      prev.filter((item) => prev.indexOf(item) !== i)
+    );
+    setNomedocumento((prev) => prev.filter((item) => prev.indexOf(item) !== i));
   }
 
   return (
@@ -631,42 +645,91 @@ const Edit: React.FC = () => {
                 Documentos:
               </label>
               <div className="input-documentos d-flex">
-                {documento_anexo && (
+                {documento_anexo.length > 0 ? (
                   <>
-                    {documento_anexo.indexOf("image/") > -1 && (
-                      <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                        <i className="far fa-file-image download"></i>
-                        <p className="texto-usuario">{nomedocumento}</p>
-                      </div>
-                    )}
-                    {documento_anexo.indexOf("application/pdf") > -1 && (
-                      <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                        <i className="far fa-file-pdf download"></i>
-                        <p className="texto-usuario">{nomedocumento}</p>
-                      </div>
-                    )}
-                    {documento_anexo.indexOf("application/msword") > -1 && (
-                      <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                        <i className="far fa-file-word download"></i>
-                        <p className="texto-usuario">{nomedocumento}</p>
-                      </div>
-                    )}
-                    {documento_anexo.indexOf(
-                      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    ) > -1 && (
-                      <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                        <i className="far fa-file-excel download"></i>
-                        <p className="texto-usuario">{nomedocumento}</p>
-                      </div>
-                    )}
-                    {documento_anexo.indexOf("text/plain") > -1 && (
-                      <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                        <i className="far fa-file-lines download"></i>
-                        <p className="texto-usuario">{nomedocumento}</p>
-                      </div>
-                    )}
+                    {documento_anexo.map((value, index) => (
+                      <>
+                        {value.indexOf("image/") > -1 ? (
+                          <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                            <i className="far fa-file-image download position-relative">
+                              <button
+                                onClick={(e) => excluir_arquivo(index, e)}
+                                className="botao-excluir-arquivo"
+                              >
+                                <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                              </button>
+                            </i>
+                            <p className="texto-usuario">
+                              {nomedocumento[index]}
+                            </p>
+                          </div>
+                        ) : null}
+                        {value.indexOf("application/pdf") > -1 ? (
+                          <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                            <i className="far fa-file-pdf download position-relative">
+                              <button
+                                onClick={(e) => excluir_arquivo(index, e)}
+                                className="botao-excluir-arquivo"
+                              >
+                                <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                              </button>
+                            </i>
+                            <p className="texto-usuario">
+                              {nomedocumento[index]}
+                            </p>
+                          </div>
+                        ) : null}
+                        {value.indexOf("application/msword") > -1 ? (
+                          <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                            <i className="far fa-file-word download position-relative">
+                              <button
+                                onClick={(e) => excluir_arquivo(index, e)}
+                                className="botao-excluir-arquivo"
+                              >
+                                <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                              </button>
+                            </i>
+                            <p className="texto-usuario">
+                              {nomedocumento[index]}
+                            </p>
+                          </div>
+                        ) : null}
+                        {value.indexOf(
+                          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        ) > -1 ? (
+                          <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                            <i className="far fa-file-excel download position-relative">
+                              <button
+                                onClick={(e) => excluir_arquivo(index, e)}
+                                className="botao-excluir-arquivo"
+                              >
+                                <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                              </button>
+                            </i>
+                            <p className="texto-usuario">
+                              {nomedocumento[index]}
+                            </p>
+                          </div>
+                        ) : null}
+                        {value.indexOf("text/plain") > -1 ? (
+                          <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                            <i className="far fa-file-lines download position-relative">
+                              <button
+                                onClick={(e) => excluir_arquivo(index, e)}
+                                className="botao-excluir-arquivo"
+                              >
+                                <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                              </button>
+                            </i>
+                            <p className="texto-usuario">
+                              {nomedocumento[index]}
+                            </p>
+                          </div>
+                        ) : null}
+                      </>
+                    ))}
                   </>
-                )}
+                ) : null}
               </div>
               <br />
               <label htmlFor="" className="anexar">

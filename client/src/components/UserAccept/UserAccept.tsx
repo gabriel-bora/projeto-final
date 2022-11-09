@@ -33,6 +33,16 @@ const UserAccept: React.FC<DadosUserAccept> = ({
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  let listaArquivos: string[] = [];
+  if (documento_justificativa !== null) {
+    listaArquivos = JSON.parse(documento_justificativa);
+  }
+
+  let listaNomesArquivos: string[] = [];
+  if (nome_documento_justificativa !== null) {
+    listaNomesArquivos = JSON.parse(nome_documento_justificativa);
+  }
+
   return (
     <UserAcceptStyled colaborador_foto_perfil={colaborador_foto_perfil}>
       <h6 className="ps-3 pt-1">{colaborador_setor}:</h6>
@@ -65,75 +75,79 @@ const UserAccept: React.FC<DadosUserAccept> = ({
                   <h6 className="pt-3">Anexos:</h6>
                   <div className="ms-3 input-documentos">
                     <div className="d-flex">
-                      {documento_justificativa && (
-                        <>
-                          {documento_justificativa.indexOf("image/") > -1 && (
-                            <a
-                              href={documento_justificativa}
-                              download={nome_documento_justificativa}
-                              className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                            >
-                              <i className="far fa-file-image download"></i>
-                              <p className="texto-usuario">
-                                {nome_documento_justificativa}
-                              </p>
-                            </a>
-                          )}
-                          {documento_justificativa.indexOf("application/pdf") >
-                            -1 && (
-                            <a
-                              href={documento_justificativa}
-                              download={nome_documento_justificativa}
-                              className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                            >
-                              <i className="far fa-file-pdf download"></i>
-                              <p className="texto-usuario">
-                                {nome_documento_justificativa}
-                              </p>
-                            </a>
-                          )}
-                          {documento_justificativa.indexOf(
-                            "application/msword"
-                          ) > -1 && (
-                            <a
-                              href={documento_justificativa}
-                              download={nome_documento_justificativa}
-                              className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                            >
-                              <i className="far fa-file-word download"></i>
-                              <p className="texto-usuario">
-                                {nome_documento_justificativa}
-                              </p>
-                            </a>
-                          )}
-                          {documento_justificativa.indexOf(
-                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                          ) > -1 && (
-                            <a
-                              href={documento_justificativa}
-                              download={nome_documento_justificativa}
-                              className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                            >
-                              <i className="far fa-file-excel download"></i>
-                              <p className="texto-usuario">
-                                {nome_documento_justificativa}
-                              </p>
-                            </a>
-                          )}
-                          {documento_justificativa.indexOf("text/plain") >
-                            -1 && (
-                            <a
-                              href={documento_justificativa}
-                              download={nome_documento_justificativa}
-                              className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                            >
-                              <i className="far fa-file-lines download"></i>
-                              <p className="texto-usuario">
-                                {nome_documento_justificativa}
-                              </p>
-                            </a>
-                          )}
-                        </>
+                      {listaArquivos.length > 0 ? (
+                        <div className="d-flex">
+                          {listaArquivos.map((value, index) => (
+                            <>
+                              {value.indexOf("image/") > -1 && (
+                                <a
+                                  href={value}
+                                  download={listaNomesArquivos[index]}
+                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                >
+                                  <i className="far fa-file-image download"></i>
+                                  <p className="texto-usuario">
+                                    {listaNomesArquivos[index]}
+                                  </p>
+                                </a>
+                              )}
+                              {value.indexOf("application/pdf") > -1 && (
+                                <a
+                                  href={value}
+                                  download={listaNomesArquivos[index]}
+                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                >
+                                  <i className="far fa-file-pdf download"></i>
+                                  <p className="texto-usuario">
+                                    {listaNomesArquivos[index]}
+                                  </p>
+                                </a>
+                              )}
+                              {value.indexOf("application/msword") > -1 && (
+                                <a
+                                  href={value}
+                                  download={listaNomesArquivos[index]}
+                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                >
+                                  <i className="far fa-file-word download"></i>
+                                  <p className="texto-usuario">
+                                    {listaNomesArquivos[index]}
+                                  </p>
+                                </a>
+                              )}
+                              {value.indexOf(
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                              ) > -1 && (
+                                <a
+                                  href={value}
+                                  download={listaNomesArquivos[index]}
+                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                >
+                                  <i className="far fa-file-excel download"></i>
+                                  <p className="texto-usuario">
+                                    {listaNomesArquivos[index]}
+                                  </p>
+                                </a>
+                              )}
+                              {value.indexOf("text/plain") > -1 && (
+                                <a
+                                  href={value}
+                                  download={listaNomesArquivos[index]}
+                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                >
+                                  <i className="far fa-file-lines download"></i>
+                                  <p className="texto-usuario">
+                                    {listaNomesArquivos[index]}
+                                  </p>
+                                </a>
+                              )}
+                            </>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="texto-usuario text-center">
+                          Nenhum anexo para esta rejeição
+                        </p>
                       )}
                     </div>
                   </div>

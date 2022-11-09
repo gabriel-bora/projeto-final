@@ -10,9 +10,10 @@ const sequelize = new Sequelize("projetofinal", "root", "root123", {
 });
 
 app.use(cors());
-app.use(express.json());
-app.use(bp.json());
-app.use(bp.urlencoded({ extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+app.use(bp.json({ limit: "50mb" }));
+app.use(bp.urlencoded({ limit: "50mb", extended: true }));
 
 const Colaborador = sequelize.define(
   "Colaborador",
@@ -99,7 +100,7 @@ const CRM = sequelize.define(
       allowNull: true,
     },
     documento_anexo: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true,
     },
     nome_documento: {
@@ -138,7 +139,7 @@ const Aceite = sequelize.define(
       allowNull: true,
     },
     documento_justificativa: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true,
     },
     nome_documento_justificativa: {
