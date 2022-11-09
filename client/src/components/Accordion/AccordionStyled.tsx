@@ -196,27 +196,32 @@ const AccordionStyled = styled.section<Props>`
     font-weight: 900;
   }
 
-  .muito-baixa {
+  .muito-baixa,
+  select:has(.muito-baixa:checked) {
     background-color: #2b7af1;
     color: #fff;
   }
 
-  .baixa {
+  .baixa,
+  select:has(.baixa:checked) {
     background-color: #3dc764;
     color: #fff;
   }
 
-  .media {
+  .media,
+  select:has(.media:checked) {
     background-color: #fec400;
     color: #fff;
   }
 
-  .alta {
+  .alta,
+  select:has(.alta:checked) {
     background-color: #f12b2c;
     color: #fff;
   }
 
-  .muito-alta {
+  .muito-alta,
+  select:has(.muito-alta:checked) {
     background-color: #2c2c2c;
     color: #fff;
   }
@@ -230,6 +235,7 @@ const AccordionStyled = styled.section<Props>`
     font-weight: 700;
     outline: none;
     border: none;
+    background-color: #c4c4c4;
   }
 
   .texto-usuario {

@@ -228,6 +228,7 @@ app.post("/createCRM", (req, res) => {
     dependencia_outro_crm: req.body.dependencia_outro_crm,
     numero_crm_dependencia: req.body.numero_crm_dependencia,
     documento_anexo: req.body.documento_anexo,
+    nome_documento: req.body.nome_documento,
     data_inicio: req.body.data_inicio,
   }).then(() => {
     res.send("CRM criada!");
@@ -244,6 +245,46 @@ app.get("/getAllCRMs", (req, res) => {
   sequelize
     .query(
       "SELECT * FROM CRMs INNER JOIN Colaboradors ON CRMs.colaborador_id=Colaboradors.matricula;"
+    )
+    .then((data) => {
+      res.send(data);
+    });
+});
+
+app.post("/getSearchCRMs", (req, res) => {
+  sequelize
+    .query(
+      `SELECT * FROM CRMs INNER JOIN Colaboradors ON CRMs.colaborador_id=Colaboradors.matricula WHERE id=${req.body.pesquisa};`
+    )
+    .then((data) => {
+      res.send(data);
+    });
+});
+
+app.post("/getSearchName", (req, res) => {
+  sequelize
+    .query(
+      `SELECT * FROM CRMs INNER JOIN Colaboradors ON CRMs.colaborador_id=Colaboradors.matricula WHERE nome LIKE CONCAT('%','${req.body.pesquisa}','%');`
+    )
+    .then((data) => {
+      res.send(data);
+    });
+});
+
+app.post("/getSearchDate", (req, res) => {
+  sequelize
+    .query(
+      `SELECT * FROM CRMs INNER JOIN Colaboradors ON CRMs.colaborador_id=Colaboradors.matricula WHERE data_inicio='${req.body.pesquisa}';`
+    )
+    .then((data) => {
+      res.send(data);
+    });
+});
+
+app.post("/getSearchDateArq", (req, res) => {
+  sequelize
+    .query(
+      `SELECT * FROM CRMs INNER JOIN Colaboradors ON CRMs.colaborador_id=Colaboradors.matricula WHERE data_arquivamento='${req.body.pesquisa}';`
     )
     .then((data) => {
       res.send(data);
@@ -280,6 +321,14 @@ app.post("/updateCRM_TI", (req, res) => {
     }
   ).then(() => {
     res.send(`CRM atualizada`);
+  });
+});
+
+app.post("/getCRMEdit", (req, res) => {
+  CRM.findOne({
+    where: { id: req.body.id, versao_crm: req.body.versao_crm },
+  }).then((data) => {
+    res.send(data);
   });
 });
 

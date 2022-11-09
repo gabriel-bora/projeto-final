@@ -182,10 +182,6 @@ const Edit: React.FC = () => {
   const today = new Date(timeElapsed);
   const hoje = today.toLocaleDateString();
 
-  const [showElement3, setShowElement3] = useState(false);
-  const showOrHide3 = () => setShowElement3(true);
-  const showOrHide = () => setShowElement3(false);
-
   const [nome, setNome] = useState<string>();
   const [id, setId] = useState<string>();
   const [telefone, setTelefone] = useState<string>();
@@ -205,9 +201,9 @@ const Edit: React.FC = () => {
   const [data_obrigatoriedade, setData_obrigatoriedade] = useState<string>();
   const [complexidade, setComplexidade] = useState(0);
   const [sistemas_envolvidos, setSistemas_envolvidos] = useState<string[]>([]);
+  const [setores_envolvidos, setSetores_envolvidos] = useState<string[]>();
   const [comportamento_offline, setComportamento_offline] = useState<string>();
-  const [dependencia_outro_crm, setDependendia_outro_crm] =
-    useState<string>("nao");
+  const [dependencia_outro_crm, setDependendia_outro_crm] = useState<string>();
   const [numero_crm_dependencia, setNumero_dependencia_crm] =
     useState<string>();
   const [documento_anexo, setDocumento_anexo] = useState<string>();
@@ -216,6 +212,10 @@ const Edit: React.FC = () => {
   interface FilmOptionType {
     setor: string;
   }
+
+  const [showElement3, setShowElement3] = useState(true);
+  const showOrHide3 = () => setShowElement3(true);
+  const showOrHide = () => setShowElement3(false);
 
   const [listaSetores, setListaSetores] = useState<FilmOptionType[]>([
     { setor: "Administrativo" },
@@ -230,6 +230,8 @@ const Edit: React.FC = () => {
     { setor: "TI" },
   ]);
 
+  const listaSistemas = ["CLIQQ", "PDV", "VERDECARD", "SAP", "VCS"];
+
   useEffect(() => {
     let usuario = localStorage.getItem("usuario-logado");
     axios
@@ -242,14 +244,34 @@ const Edit: React.FC = () => {
         setEmail(response.data.email);
         setFoto(response.data.foto_perfil);
       });
-    axios.get("http://localhost:3001/getMaxCRM").then((response) => {
-      setIdCRM(response.data[0][0].valor + 1);
-      const n = (response.data[0][0].valor + 1).toLocaleString("en-US", {
-        minimumIntegerDigits: 5,
-        useGrouping: false,
+    let id_crm = Number(localStorage.getItem("id-crm"));
+    let versao_crm = Number(localStorage.getItem("versao-crm"));
+    axios
+      .post("http://localhost:3001/getCRMEdit", {
+        id: id_crm,
+        versao_crm: versao_crm,
+      })
+      .then((response) => {
+        setIdCRM(response.data.id);
+        const n = response.data.id.toLocaleString("en-US", {
+          minimumIntegerDigits: 5,
+          useGrouping: false,
+        });
+        setIdCRMDisplay(n);
+        setNecessidade(response.data.necessidade);
+        setImpacto(response.data.impacto);
+        setDescricao(response.data.descricao);
+        setObjetivo(response.data.objetivo);
+        setJustificativa(response.data.justificativa);
+        setAlternativa(response.data.alternativas);
+        setVersao(response.data.versao_crm + 1);
+        setData_obrigatoriedade(response.data.data_obrigatoriedade);
+        setComportamento_offline(response.data.comportamento_offline);
+        setSetores_envolvidos(JSON.parse(response.data.setores_envolvidos));
+        setSistemas_envolvidos(JSON.parse(response.data.sistemas_envolvidos));
+        setDependendia_outro_crm(response.data.dependencia_outro_crm);
+        setNumero_dependencia_crm(response.data.numero_crm_dependencia);
       });
-      setIdCRMDisplay(n);
-    });
   }, []);
 
   function criarCRM(e: any) {
@@ -287,8 +309,12 @@ const Edit: React.FC = () => {
       });
   }
 
+  let setores: FilmOptionType[] = [listaSetores[0], listaSetores[5]];
+
+  console.log(setores);
+
   const fixedOptions = [listaSetores[9]];
-  const [valor, setValor] = React.useState([...fixedOptions]);
+  const [valor, setValor] = React.useState([...fixedOptions, ...setores]);
 
   const {
     getRootProps,
@@ -303,7 +329,7 @@ const Edit: React.FC = () => {
     setAnchorEl,
   } = useAutocomplete({
     id: "customized-hook-demo",
-    defaultValue: [listaSetores[9]],
+    defaultValue: [],
     multiple: true,
     options: listaSetores,
     value: valor,
@@ -462,92 +488,47 @@ const Edit: React.FC = () => {
               />
               <br />
               <h3 className="mt-3">Sistemas envolvidos na mudança:</h3>
-              <div className="d-flex justify-content-between">
-                <div>
-                  <label htmlFor="CLIQQ" className="label-checkbox">
-                    CLIQQ:
-                  </label>
-                  <input
-                    type="checkbox"
-                    name="CLIQQ"
-                    value="CLIQQ"
-                    id=""
-                    className="checkbox ms-1"
-                    onChange={(e) =>
-                      setSistemas_envolvidos(
-                        sistemas_envolvidos?.concat(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label htmlFor="PDV" className="label-checkbox">
-                    PDV:
-                  </label>
-                  <input
-                    type="checkbox"
-                    name="PDV"
-                    value="PDV"
-                    id=""
-                    className="checkbox ms-1"
-                    onChange={(e) =>
-                      setSistemas_envolvidos(
-                        sistemas_envolvidos?.concat(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label htmlFor="VERDECARD" className="label-checkbox">
-                    VERDECARD:
-                  </label>
-                  <input
-                    type="checkbox"
-                    name="VERDECARD"
-                    value="VERDECARD"
-                    id=""
-                    className="checkbox ms-1"
-                    onChange={(e) =>
-                      setSistemas_envolvidos(
-                        sistemas_envolvidos?.concat(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label htmlFor="SAP" className="label-checkbox">
-                    SAP:
-                  </label>
-                  <input
-                    type="checkbox"
-                    name="SAP"
-                    value="SAP"
-                    id=""
-                    className="checkbox ms-1"
-                    onChange={(e) =>
-                      setSistemas_envolvidos(
-                        sistemas_envolvidos?.concat(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div className="me-5">
-                  <label htmlFor="VCS" className="label-checkbox">
-                    VCS:
-                  </label>
-                  <input
-                    type="checkbox"
-                    name="VCS"
-                    value="VCS"
-                    id=""
-                    className="checkbox ms-1"
-                    onChange={(e) =>
-                      setSistemas_envolvidos(
-                        sistemas_envolvidos?.concat(e.target.value)
-                      )
-                    }
-                  />
-                </div>
+              <div className="d-flex justify-content-between me-5">
+                {listaSistemas.map((value) =>
+                  sistemas_envolvidos.includes(value) ? (
+                    <div>
+                      <label htmlFor={value} className="label-checkbox">
+                        {value}:
+                      </label>
+                      <input
+                        type="checkbox"
+                        name={value}
+                        value={value}
+                        id=""
+                        className="checkbox ms-1"
+                        onChange={(e) =>
+                          setSistemas_envolvidos(
+                            sistemas_envolvidos?.concat(e.target.value)
+                          )
+                        }
+                        checked
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <label htmlFor={value} className="label-checkbox">
+                        {value}:
+                      </label>
+                      <input
+                        type="checkbox"
+                        name={value}
+                        value={value}
+                        id=""
+                        className="checkbox ms-1"
+                        onChange={(e) =>
+                          setSistemas_envolvidos(
+                            sistemas_envolvidos?.concat(e.target.value)
+                          )
+                        }
+                      />
+                    </div>
+                  )
+                )}
               </div>
               <label className="mt-3" htmlFor="comportamento-offline">
                 Comportamento Offline &#40;time Mercantil&#41;:
@@ -563,31 +544,71 @@ const Edit: React.FC = () => {
                 Essa CRM depende de outro desenvolvimento?
               </h3>
               <div className="d-flex justify-content-start">
-                <label className="label-checkbox">
-                  Sim:
-                  <input
-                    type="radio"
-                    name="depende"
-                    value="sim"
-                    id=""
-                    className="checkbox ms-1"
-                    onChange={(e) => setDependendia_outro_crm(e.target.value)}
-                    onClick={showOrHide3}
-                  />
-                </label>
-
-                <label className="label-checkbox ms-2">
-                  Não:
-                  <input
-                    type="radio"
-                    name="depende"
-                    value="nao"
-                    id=""
-                    className="checkbox ms-1"
-                    onChange={(e) => setDependendia_outro_crm(e.target.value)}
-                    onClick={showOrHide}
-                  />
-                </label>
+                {dependencia_outro_crm === "sim" ? (
+                  <>
+                    <label className="label-checkbox">
+                      Sim:
+                      <input
+                        type="radio"
+                        name="depende"
+                        value="sim"
+                        id=""
+                        className="checkbox ms-1"
+                        onChange={(e) =>
+                          setDependendia_outro_crm(e.target.value)
+                        }
+                        onClick={showOrHide3}
+                        checked
+                      />
+                    </label>
+                    <label className="label-checkbox ms-2">
+                      Não:
+                      <input
+                        type="radio"
+                        name="depende"
+                        value="nao"
+                        id=""
+                        className="checkbox ms-1"
+                        onChange={(e) =>
+                          setDependendia_outro_crm(e.target.value)
+                        }
+                        onClick={showOrHide}
+                      />
+                    </label>
+                  </>
+                ) : (
+                  <>
+                    <label className="label-checkbox">
+                      Sim:
+                      <input
+                        type="radio"
+                        name="depende"
+                        value="sim"
+                        id=""
+                        className="checkbox ms-1"
+                        onChange={(e) =>
+                          setDependendia_outro_crm(e.target.value)
+                        }
+                        onClick={showOrHide3}
+                      />
+                    </label>
+                    <label className="label-checkbox ms-2">
+                      Não:
+                      <input
+                        type="radio"
+                        name="depende"
+                        value="nao"
+                        id=""
+                        className="checkbox ms-1"
+                        onChange={(e) =>
+                          setDependendia_outro_crm(e.target.value)
+                        }
+                        onClick={showOrHide}
+                        checked
+                      />
+                    </label>
+                  </>
+                )}
               </div>
               {showElement3 ? (
                 <div>

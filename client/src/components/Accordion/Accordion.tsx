@@ -236,7 +236,7 @@ const Accordion: React.FC<DadosCRM> = ({
     if (listaSetoresAceite.indexOf(element) == -1) return element;
   });
   let status: string = "";
-  if (listaAceites1.some((v) => v.aceite === "nao")) {
+  if (diferenca.length === 0 && listaAceites1.some((v) => v.aceite === "nao")) {
     status = "rejeitada";
   } else if (diferenca.length === 0) {
     status = "arquivada";
@@ -273,6 +273,7 @@ const Accordion: React.FC<DadosCRM> = ({
         alert(response.data);
       });
     if (
+      listaAceites1.every((v) => v.aceite === "sim") &&
       diferenca.length === 1 &&
       diferenca[0] === setorUsuario &&
       complexidade !== 0
@@ -359,25 +360,40 @@ const Accordion: React.FC<DadosCRM> = ({
   }
 
   function editar_crm() {
-    localStorage.setItem(
-      "id-versao-crm",
-      JSON.stringify({ id: id, versao: versao_crm })
-    );
+    localStorage.setItem("id-crm", JSON.stringify(id));
+    localStorage.setItem("versao-crm", JSON.stringify(versao_crm));
     navigate("/editcrm");
+  }
+
+  function search() {
+    localStorage.setItem("pesquisa", JSON.stringify(id));
+    localStorage.removeItem("data-arq");
+    localStorage.removeItem("data-inicio");
+    if (
+      window.location.href ===
+      "http://localhost:3000/projeto-final-crm/searchcrm"
+    ) {
+      window.location.reload();
+    } else {
+      navigate("/searchcrm");
+    }
   }
 
   return (
     <AccordionStyled foto_perfil={foto_perfil}>
       <div className="accordion my-2" id="accordionExample">
-        <h2 className="accordion-header" id={"heading" + id}></h2>
-        <h2 className="accordion-header" id={"panelsStayOpen-heading" + id}>
+        <h2 className="accordion-header" id={"heading" + id + versao_crm}></h2>
+        <h2
+          className="accordion-header"
+          id={"panelsStayOpen-heading" + id + versao_crm}
+        >
           <button
             className="accordion-button collapsed botaoAccordion d-flex align-items-center"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target={"#panelsStayOpen-collapse" + id}
+            data-bs-target={"#panelsStayOpen-collapse" + id + versao_crm}
             aria-expanded="false"
-            aria-controls={"panelsStayOpen-collapse" + id}
+            aria-controls={"panelsStayOpen-collapse" + id + versao_crm}
           >
             <div className="container-fluid info-crm-fechado">
               <div className="row d-flex align-items-center">
@@ -443,9 +459,9 @@ const Accordion: React.FC<DadosCRM> = ({
           </button>
         </h2>
         <div
-          id={"panelsStayOpen-collapse" + id}
+          id={"panelsStayOpen-collapse" + id + versao_crm}
           className="accordion-collapse collapse"
-          aria-labelledby={"panelsStayOpen-heading" + id}
+          aria-labelledby={"panelsStayOpen-heading" + id + versao_crm}
         >
           <div className="accordion-body bodyAccordion">
             <section className="container-fluid m-0 p-0">
@@ -1013,8 +1029,15 @@ const Accordion: React.FC<DadosCRM> = ({
                 <div className="col-2">
                   <h6 className="pt-3">Versão:</h6>
                   <div className="texto-bold d-flex justify-content-end">
-                    {/* <button className="texto-bold versao">v1</button> */}
                     <div className="ps-3">v{versao_crm}</div>
+                    {versao_crm > 1 ? (
+                      <button
+                        onClick={search}
+                        className="texto-bold versao ps-3"
+                      >
+                        <i className="fa-solid fa-angles-right"></i>
+                      </button>
+                    ) : null}
                   </div>
                   <h6 className="pt-3">Data Criação:</h6>
                   <div className="texto-usuario d-flex justify-content-end">

@@ -17,7 +17,7 @@ interface DadosUserAccept {
   nome_documento_justificativa: string;
 }
 
-const Accordion: React.FC<DadosUserAccept> = ({
+const UserAccept: React.FC<DadosUserAccept> = ({
   colaborador_setor,
   colaborador_id,
   colaborador_nome,
@@ -152,4 +152,4 @@ const Accordion: React.FC<DadosUserAccept> = ({
   );
 };
 
-export default Accordion;
+export default UserAccept;
