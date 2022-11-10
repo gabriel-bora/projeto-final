@@ -322,8 +322,14 @@ const Edit: React.FC = () => {
           alert(response.data);
           localStorage.removeItem("versao-crm");
           localStorage.removeItem("id-crm");
-          navigate("/home");
         });
+      axios.post("http://localhost:3001/emailCRM", {
+        usuario: nome,
+        crm: idCRMDisplay,
+        versao: versao,
+        setor: listaSetoresCheck,
+      });
+      navigate("/home");
     }
   }
 

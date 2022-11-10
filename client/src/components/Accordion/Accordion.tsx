@@ -233,8 +233,15 @@ const Accordion: React.FC<DadosCRM> = ({
         })
         .then((response) => {
           alert(response.data);
-          window.location.reload();
         });
+      axios.post("http://localhost:3001/emailAccept", {
+        usuario: nome,
+        crm: n,
+        versao: versao_crm,
+        email: email,
+        mensagem: "rejeitou",
+      });
+      window.location.reload();
     }
   }
 
@@ -288,6 +295,13 @@ const Accordion: React.FC<DadosCRM> = ({
     ) {
       arquivar();
     }
+    axios.post("http://localhost:3001/emailAccept", {
+      usuario: nomeUsuario,
+      crm: n,
+      versao: versao_crm,
+      email: email,
+      mensagem: "aceitou",
+    });
     window.location.reload();
   };
 

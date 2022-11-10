@@ -303,8 +303,16 @@ const Form: React.FC = () => {
         })
         .then((response) => {
           alert(response.data);
-          navigate("/home");
         });
+      axios
+        .post("http://localhost:3001/emailCRM", {
+          usuario: nome,
+          crm: idCRMDisplay,
+          versao: versao,
+          setor: listaSetoresCheck,
+        })
+        .then((response) => console.log(response));
+      navigate("/home");
     }
   }
 

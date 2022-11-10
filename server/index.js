@@ -3,6 +3,7 @@ const app = express();
 const { Sequelize, DataTypes } = require("sequelize");
 const cors = require("cors");
 const bp = require("body-parser");
+const nodemailer = require("nodemailer");
 
 const sequelize = new Sequelize("projetofinal", "root", "root123", {
   host: "localhost",
@@ -14,6 +15,14 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(bp.json({ limit: "50mb" }));
 app.use(bp.urlencoded({ limit: "50mb", extended: true }));
+
+let transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "statuscrm.queroquero@gmail.com",
+    pass: "dzuswsvhxrbycwhd",
+  },
+});
 
 const Colaborador = sequelize.define(
   "Colaborador",
@@ -374,6 +383,44 @@ app.post("/getAccepts", (req, res) => {
   }).then((data) => {
     res.send(data);
   });
+});
+
+app.post("/emailCRM", (req, res) => {
+  req.body.setor.map((value) =>
+    sequelize
+      .query(`SELECT email FROM Colaboradors WHERE setor = '${value}';`)
+      .then((data) => {
+        transporter
+          .sendMail({
+            from: "Status CRM QQ <statuscrm.queroquero@gmail.com>",
+            to: data[0][0].email,
+            subject: `${req.body.usuario} criou a CRM ${req.body.crm} v${req.body.versao} e o seu setor está envolvido nela`,
+            html: "Verifique a CRM dentro da <a href='http://localhost:3000/projeto-final-crm'>aplicação</a>.",
+          })
+          .then((message) => {
+            console.log(message);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })
+  );
+});
+
+app.post("/emailAccept", (req, res) => {
+  transporter
+    .sendMail({
+      from: "Status CRM QQ <statuscrm.queroquero@gmail.com>",
+      to: req.body.email,
+      subject: `${req.body.usuario} ${req.body.mensagem} a CRM ${req.body.crm} v${req.body.versao} que você é o responsável`,
+      html: "Verifique a CRM dentro da <a href='http://localhost:3000/projeto-final-crm'>aplicação</a>.",
+    })
+    .then((message) => {
+      console.log(message);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 app.listen(3001, () => {

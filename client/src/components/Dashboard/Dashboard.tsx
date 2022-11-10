@@ -19,12 +19,14 @@ const Dashboard: React.FC = () => {
     localStorage.removeItem("id-crm");
   }, []);
 
-  let lista: any[] = [];
+  let listaCRM: any[] = [];
   if (listCRMs == null) {
-    lista = [];
+    listaCRM = [];
   } else {
-    lista = listCRMs;
+    listaCRM = listCRMs;
   }
+
+  let lista = listaCRM.sort((a, b) => a.id - b.id);
 
   return (
     <DashboardStyled>
