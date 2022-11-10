@@ -12,7 +12,8 @@ import * as moment from "moment";
 import "moment/locale/pt-br";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Buffer } from "node:buffer";
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
 
 interface DadosCRM {
   id: number;
@@ -76,6 +77,22 @@ const Accordion: React.FC<DadosCRM> = ({
   const [showRejeitar, setShowRejeitar] = useState(false);
   const handleCloseRejeitar = () => setShowRejeitar(false);
   const handleShowRejeitar = () => setShowRejeitar(true);
+
+  const [showA, setShowA] = useState(false);
+  const [showTextoA, setShowTextoA] = useState<string>();
+  const toastA = (mensagem: string) => {
+    setShowTextoA(mensagem);
+    setShowA(true);
+  };
+  const closeToastA = () => {
+    setShowA(false);
+    window.location.reload();
+  };
+
+  const [showB, setShowB] = useState(false);
+  const toastB = () => {
+    setShowB(true);
+  };
 
   const [showObjetivo, setShowObjetivo] = useState(false);
   const handleCloseObjetivo = () => setShowObjetivo(false);
@@ -213,7 +230,7 @@ const Accordion: React.FC<DadosCRM> = ({
   function rejeitar(e: any) {
     e.preventDefault();
     if (justificativaRejeitar === undefined || justificativaRejeitar === "") {
-      window.alert("Para rejeitar é necessário uma justificativa");
+      toastB();
       return;
     } else {
       axios
@@ -232,7 +249,7 @@ const Accordion: React.FC<DadosCRM> = ({
           nome_documento_justificativa: JSON.stringify(nomedocumentoRejeitar),
         })
         .then((response) => {
-          alert(response.data);
+          toastA(response.data);
         });
       axios.post("http://localhost:3001/emailAccept", {
         usuario: nome,
@@ -241,7 +258,6 @@ const Accordion: React.FC<DadosCRM> = ({
         email: email,
         mensagem: "rejeitou",
       });
-      window.location.reload();
     }
   }
 
@@ -267,7 +283,7 @@ const Accordion: React.FC<DadosCRM> = ({
         data_arquivamento: today,
       })
       .then((response) => {
-        alert(response.data);
+        toastA(response.data);
       });
   };
 
@@ -285,7 +301,7 @@ const Accordion: React.FC<DadosCRM> = ({
         aceite: "sim",
       })
       .then((response) => {
-        alert(response.data);
+        toastA(response.data);
       });
     if (
       listaAceites1.every((v) => v.aceite === "sim") &&
@@ -302,7 +318,6 @@ const Accordion: React.FC<DadosCRM> = ({
       email: email,
       mensagem: "aceitou",
     });
-    window.location.reload();
   };
 
   const [versaoMaxima, setVersaoMaxima] = useState<number>();
@@ -394,12 +409,15 @@ const Accordion: React.FC<DadosCRM> = ({
         impacto_ti: impactoTI,
       })
       .then((response) => {
-        alert(response.data);
+        toastA(response.data);
       });
-    if (diferenca.length === 0 && complexidadeUpdate !== 0) {
+    if (
+      diferenca.length === 0 &&
+      complexidadeUpdate !== 0 &&
+      status === "arquivada"
+    ) {
       arquivar();
     }
-    window.location.reload();
   }
 
   function editar_crm() {
@@ -433,914 +451,945 @@ const Accordion: React.FC<DadosCRM> = ({
   }
 
   return (
-    <AccordionStyled foto_perfil={foto_perfil}>
-      <div className="accordion my-2" id="accordionExample">
-        <h2 className="accordion-header" id={"heading" + id + versao_crm}></h2>
-        <h2
-          className="accordion-header"
-          id={"panelsStayOpen-heading" + id + versao_crm}
-        >
-          <button
-            className="accordion-button collapsed botaoAccordion d-flex align-items-center"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target={"#panelsStayOpen-collapse" + id + versao_crm}
-            aria-expanded="false"
-            aria-controls={"panelsStayOpen-collapse" + id + versao_crm}
+    <>
+      <AccordionStyled foto_perfil={foto_perfil}>
+        <div className="accordion my-2" id="accordionExample">
+          <h2
+            className="accordion-header"
+            id={"heading" + id + versao_crm}
+          ></h2>
+          <h2
+            className="accordion-header"
+            id={"panelsStayOpen-heading" + id + versao_crm}
           >
-            <div className="container-fluid info-crm-fechado">
-              <div className="row d-flex align-items-center">
-                <div className="col-1 p-1">{switchStatus(status)}</div>
-                <div className="col-2">
-                  <div className="texto-bold">{n}</div>
-                  <div className="texto-light pt-1">
-                    Atualizada {data_relativa}
-                  </div>
-                </div>
-                <div className="col-3 d-flex">
-                  <div>
-                    <div className="avatar"></div>
-                  </div>
-                  <div className="ps-2">
-                    <div className="texto-bold">
-                      {nome} &#40;{colaborador_id}&#41;
+            <button
+              className="accordion-button collapsed botaoAccordion d-flex align-items-center"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target={"#panelsStayOpen-collapse" + id + versao_crm}
+              aria-expanded="false"
+              aria-controls={"panelsStayOpen-collapse" + id + versao_crm}
+            >
+              <div className="container-fluid info-crm-fechado">
+                <div className="row d-flex align-items-center">
+                  <div className="col-1 p-1">{switchStatus(status)}</div>
+                  <div className="col-2">
+                    <div className="texto-bold">{n}</div>
+                    <div className="texto-light pt-1">
+                      Atualizada {data_relativa}
                     </div>
-                    <div className="texto-light pt-1 ps-1">{email}</div>
                   </div>
-                </div>
-                <div className="col-3">
-                  <div className="texto-bold">{necessidade}</div>
-                  <div className="texto-light pt-1 ps-1">
-                    {colaborador_setor}
-                  </div>
-                </div>
-                <div className="col-1">
-                  <div className="texto-bold">v{versao_crm}</div>
-                  <div className="texto-light pt-1">{data_inicio}</div>
-                </div>
-                <div className="col-2">{switchComplexidade(complexidade)}</div>
-              </div>
-            </div>
-            <div className="container-fluid info-crm-aberto">
-              <div className="row d-flex align-items-center">
-                <div className="col-4 d-flex justify-content-center texto-bold">
-                  CRM nº: {n}
-                </div>
-                <div className="col-6 d-flex justify-content-center texto-bold">
-                  Necessidade: {necessidade}
-                </div>
-                <div className="col-2 d-flex justify-content-center">
-                  {setorUsuario === colaborador_setor &&
-                  data_arquivamento === null &&
-                  versaoMaxima == versao_crm ? (
-                    <button
-                      className="botao-editar botao-editar-habilitado"
-                      onClick={editar_crm}
-                    >
-                      EDITAR CRM
-                    </button>
-                  ) : (
-                    <button
-                      className="botao-editar botao-editar-desabilitado"
-                      disabled
-                    >
-                      EDITAR CRM
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          </button>
-        </h2>
-        <div
-          id={"panelsStayOpen-collapse" + id + versao_crm}
-          className="accordion-collapse collapse"
-          aria-labelledby={"panelsStayOpen-heading" + id + versao_crm}
-        >
-          <div className="accordion-body bodyAccordion">
-            <section className="container-fluid m-0 p-0">
-              <div className="row p-0">
-                <div className="col-4">
-                  <div className="div-usuario">
-                    <h6 className="pt-3">Responsável:</h6>
-                    <div className="ps-3 d-flex">
-                      <div className="foto-usuario mt-2"></div>
-                      <div className="ps-4">
-                        <p className="texto-usuario">Nome: {nome}</p>
-                        <p className="texto-usuario">
-                          Matrícula: {colaborador_id}
-                        </p>
-                        <p className="texto-usuario">
-                          Setor: {colaborador_setor}
-                        </p>
-                        <p className="texto-usuario">Telefone: {telefone}</p>
-                        <p className="texto-usuario">E-mail: {email}</p>
+                  <div className="col-3 d-flex">
+                    <div>
+                      <div className="avatar"></div>
+                    </div>
+                    <div className="ps-2">
+                      <div className="texto-bold">
+                        {nome} &#40;{colaborador_id}&#41;
                       </div>
-                      <div></div>
+                      <div className="texto-light pt-1 ps-1">{email}</div>
                     </div>
                   </div>
-                  <div className="div-usuario mt-3">
-                    <h6>Setores participantes:</h6>
-                    {listaSetores.map((value: string) => (
-                      <>
-                        {listaSetoresAceite.indexOf(value) > -1 ? (
-                          <>
-                            {
-                              <UserAccept
-                                colaborador_id={
-                                  listaAceites1.find(
-                                    (e) => e.colaborador_setor === value
-                                  ).colaborador_id
-                                }
-                                colaborador_setor={
-                                  listaAceites1.find(
-                                    (e) => e.colaborador_setor === value
-                                  ).colaborador_setor
-                                }
-                                colaborador_nome={
-                                  listaAceites1.find(
-                                    (e) => e.colaborador_setor === value
-                                  ).colaborador_nome
-                                }
-                                colaborador_telefone={
-                                  listaAceites1.find(
-                                    (e) => e.colaborador_setor === value
-                                  ).colaborador_telefone
-                                }
-                                colaborador_email={
-                                  listaAceites1.find(
-                                    (e) => e.colaborador_setor === value
-                                  ).colaborador_email
-                                }
-                                colaborador_foto_perfil={
-                                  listaAceites1.find(
-                                    (e) => e.colaborador_setor === value
-                                  ).colaborador_foto
-                                }
-                                aceite={
-                                  listaAceites1.find(
-                                    (e) => e.colaborador_setor === value
-                                  ).aceite
-                                }
-                                justificativa={
-                                  listaAceites1.find(
-                                    (e) => e.colaborador_setor === value
-                                  ).justificativa
-                                }
-                                documento_justificativa={
-                                  listaAceites1.find(
-                                    (e) => e.colaborador_setor === value
-                                  ).documento_justificativa
-                                }
-                                nome_documento_justificativa={
-                                  listaAceites1.find(
-                                    (e) => e.colaborador_setor === value
-                                  ).nome_documento_justificativa
-                                }
-                              ></UserAccept>
-                            }
-                          </>
-                        ) : (
-                          <>
-                            {versaoMaxima! == versao_crm ? (
-                              <>
-                                {value == setorUsuario ? (
-                                  <>
-                                    <h6 className="ps-3 pt-2">{value}:</h6>
-                                    <div className="ps-3 d-flex justify-content-center">
-                                      <div className="pt-2 mb-2 d-flex">
-                                        <button
-                                          className="div-reject"
-                                          onClick={aceitar}
-                                        >
-                                          <i className="fa-solid fa-circle-check check-setor"></i>
-                                        </button>
-                                        <button
-                                          className="div-reject ms-4"
-                                          onClick={handleShowRejeitar}
-                                        >
-                                          <i className="fa-solid fa-times-circle reject-setor"></i>
-                                        </button>
-                                        <Modal
-                                          size="lg"
-                                          show={showRejeitar}
-                                          onHide={handleCloseRejeitar}
-                                        >
-                                          <Modal.Header closeButton>
-                                            <Modal.Title>
-                                              Justificativa rejeição setor{" "}
-                                              {value}:
-                                            </Modal.Title>
-                                          </Modal.Header>
-                                          <form>
-                                            <Modal.Body>
-                                              <label
-                                                htmlFor="justificativa"
-                                                className="pt-3"
-                                              >
-                                                Justificativa:
-                                              </label>
-                                              <textarea
-                                                id=""
-                                                name="justificativa"
-                                                className="input-objetivo"
-                                                value={justificativaRejeitar}
-                                                onChange={(e) =>
-                                                  setJustificativaRejeitar(
-                                                    e.target.value
-                                                  )
-                                                }
-                                                required
-                                              />
-                                              <label
-                                                className="mt-3"
-                                                htmlFor="documentos"
-                                              >
-                                                Documentos:
-                                              </label>
-                                              <div className="input-documentos d-flex">
-                                                {documento_anexoRejeitar.length >
-                                                0 ? (
-                                                  <>
-                                                    {documento_anexoRejeitar.map(
-                                                      (value, index) => (
-                                                        <>
-                                                          {value.indexOf(
-                                                            "image/"
-                                                          ) > -1 ? (
-                                                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                              <i className="far fa-file-image download position-relative">
-                                                                <button
-                                                                  onClick={(
-                                                                    e
-                                                                  ) =>
-                                                                    excluir_arquivo(
-                                                                      index,
-                                                                      e
-                                                                    )
-                                                                  }
-                                                                  className="botao-excluir-arquivo"
-                                                                >
-                                                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                                                                </button>
-                                                              </i>
-                                                              <p className="texto-usuario">
-                                                                {
-                                                                  nomedocumentoRejeitar[
-                                                                    index
-                                                                  ]
-                                                                }
-                                                              </p>
-                                                            </div>
-                                                          ) : null}
-                                                          {value.indexOf(
-                                                            "application/pdf"
-                                                          ) > -1 ? (
-                                                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                              <i className="far fa-file-pdf download position-relative">
-                                                                <button
-                                                                  onClick={(
-                                                                    e
-                                                                  ) =>
-                                                                    excluir_arquivo(
-                                                                      index,
-                                                                      e
-                                                                    )
-                                                                  }
-                                                                  className="botao-excluir-arquivo"
-                                                                >
-                                                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                                                                </button>
-                                                              </i>
-                                                              <p className="texto-usuario">
-                                                                {
-                                                                  nomedocumentoRejeitar[
-                                                                    index
-                                                                  ]
-                                                                }
-                                                              </p>
-                                                            </div>
-                                                          ) : null}
-                                                          {value.indexOf(
-                                                            "application/msword"
-                                                          ) > -1 ? (
-                                                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                              <i className="far fa-file-word download position-relative">
-                                                                <button
-                                                                  onClick={(
-                                                                    e
-                                                                  ) =>
-                                                                    excluir_arquivo(
-                                                                      index,
-                                                                      e
-                                                                    )
-                                                                  }
-                                                                  className="botao-excluir-arquivo"
-                                                                >
-                                                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                                                                </button>
-                                                              </i>
-                                                              <p className="texto-usuario">
-                                                                {
-                                                                  nomedocumentoRejeitar[
-                                                                    index
-                                                                  ]
-                                                                }
-                                                              </p>
-                                                            </div>
-                                                          ) : null}
-                                                          {value.indexOf(
-                                                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                                          ) > -1 ? (
-                                                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                              <i className="far fa-file-excel download position-relative">
-                                                                <button
-                                                                  onClick={(
-                                                                    e
-                                                                  ) =>
-                                                                    excluir_arquivo(
-                                                                      index,
-                                                                      e
-                                                                    )
-                                                                  }
-                                                                  className="botao-excluir-arquivo"
-                                                                >
-                                                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                                                                </button>
-                                                              </i>
-                                                              <p className="texto-usuario">
-                                                                {
-                                                                  nomedocumentoRejeitar[
-                                                                    index
-                                                                  ]
-                                                                }
-                                                              </p>
-                                                            </div>
-                                                          ) : null}
-                                                          {value.indexOf(
-                                                            "text/plain"
-                                                          ) > -1 ? (
-                                                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                                                              <i className="far fa-file-lines download position-relative">
-                                                                <button
-                                                                  onClick={(
-                                                                    e
-                                                                  ) =>
-                                                                    excluir_arquivo(
-                                                                      index,
-                                                                      e
-                                                                    )
-                                                                  }
-                                                                  className="botao-excluir-arquivo"
-                                                                >
-                                                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                                                                </button>
-                                                              </i>
-                                                              <p className="texto-usuario">
-                                                                {
-                                                                  nomedocumentoRejeitar[
-                                                                    index
-                                                                  ]
-                                                                }
-                                                              </p>
-                                                            </div>
-                                                          ) : null}
-                                                        </>
-                                                      )
-                                                    )}
-                                                  </>
-                                                ) : null}
-                                              </div>
-                                              <br />
-                                              <label
-                                                htmlFor=""
-                                                className="anexar ms-3"
-                                              >
-                                                <i className="fa-solid fa-upload"></i>
-                                                Anexar documentos
-                                                <input
-                                                  type="file"
-                                                  name=""
+                  <div className="col-3">
+                    <div className="texto-bold">{necessidade}</div>
+                    <div className="texto-light pt-1 ps-1">
+                      {colaborador_setor}
+                    </div>
+                  </div>
+                  <div className="col-1">
+                    <div className="texto-bold">v{versao_crm}</div>
+                    <div className="texto-light pt-1">{data_inicio}</div>
+                  </div>
+                  <div className="col-2">
+                    {switchComplexidade(complexidade)}
+                  </div>
+                </div>
+              </div>
+              <div className="container-fluid info-crm-aberto">
+                <div className="row d-flex align-items-center">
+                  <div className="col-4 d-flex justify-content-center texto-bold">
+                    CRM nº: {n}
+                  </div>
+                  <div className="col-6 d-flex justify-content-center texto-bold">
+                    Necessidade: {necessidade}
+                  </div>
+                  <div className="col-2 d-flex justify-content-center">
+                    {setorUsuario === colaborador_setor &&
+                    data_arquivamento === null &&
+                    versaoMaxima == versao_crm ? (
+                      <button
+                        className="botao-editar botao-editar-habilitado"
+                        onClick={editar_crm}
+                      >
+                        EDITAR CRM
+                      </button>
+                    ) : (
+                      <button
+                        className="botao-editar botao-editar-desabilitado"
+                        disabled
+                      >
+                        EDITAR CRM
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </button>
+          </h2>
+          <div
+            id={"panelsStayOpen-collapse" + id + versao_crm}
+            className="accordion-collapse collapse"
+            aria-labelledby={"panelsStayOpen-heading" + id + versao_crm}
+          >
+            <div className="accordion-body bodyAccordion">
+              <section className="container-fluid m-0 p-0">
+                <div className="row p-0">
+                  <div className="col-4">
+                    <div className="div-usuario">
+                      <h6 className="pt-3">Responsável:</h6>
+                      <div className="ps-3 d-flex">
+                        <div className="foto-usuario mt-2"></div>
+                        <div className="ps-4">
+                          <p className="texto-usuario">Nome: {nome}</p>
+                          <p className="texto-usuario">
+                            Matrícula: {colaborador_id}
+                          </p>
+                          <p className="texto-usuario">
+                            Setor: {colaborador_setor}
+                          </p>
+                          <p className="texto-usuario">Telefone: {telefone}</p>
+                          <p className="texto-usuario">E-mail: {email}</p>
+                        </div>
+                        <div></div>
+                      </div>
+                    </div>
+                    <div className="div-usuario mt-3">
+                      <h6>Setores participantes:</h6>
+                      {listaSetores.map((value: string) => (
+                        <>
+                          {listaSetoresAceite.indexOf(value) > -1 ? (
+                            <>
+                              {
+                                <UserAccept
+                                  colaborador_id={
+                                    listaAceites1.find(
+                                      (e) => e.colaborador_setor === value
+                                    ).colaborador_id
+                                  }
+                                  colaborador_setor={
+                                    listaAceites1.find(
+                                      (e) => e.colaborador_setor === value
+                                    ).colaborador_setor
+                                  }
+                                  colaborador_nome={
+                                    listaAceites1.find(
+                                      (e) => e.colaborador_setor === value
+                                    ).colaborador_nome
+                                  }
+                                  colaborador_telefone={
+                                    listaAceites1.find(
+                                      (e) => e.colaborador_setor === value
+                                    ).colaborador_telefone
+                                  }
+                                  colaborador_email={
+                                    listaAceites1.find(
+                                      (e) => e.colaborador_setor === value
+                                    ).colaborador_email
+                                  }
+                                  colaborador_foto_perfil={
+                                    listaAceites1.find(
+                                      (e) => e.colaborador_setor === value
+                                    ).colaborador_foto
+                                  }
+                                  aceite={
+                                    listaAceites1.find(
+                                      (e) => e.colaborador_setor === value
+                                    ).aceite
+                                  }
+                                  justificativa={
+                                    listaAceites1.find(
+                                      (e) => e.colaborador_setor === value
+                                    ).justificativa
+                                  }
+                                  documento_justificativa={
+                                    listaAceites1.find(
+                                      (e) => e.colaborador_setor === value
+                                    ).documento_justificativa
+                                  }
+                                  nome_documento_justificativa={
+                                    listaAceites1.find(
+                                      (e) => e.colaborador_setor === value
+                                    ).nome_documento_justificativa
+                                  }
+                                ></UserAccept>
+                              }
+                            </>
+                          ) : (
+                            <>
+                              {versaoMaxima! == versao_crm ? (
+                                <>
+                                  {value == setorUsuario ? (
+                                    <>
+                                      <h6 className="ps-3 pt-2">{value}:</h6>
+                                      <div className="ps-3 d-flex justify-content-center">
+                                        <div className="pt-2 mb-2 d-flex">
+                                          <button
+                                            className="div-reject"
+                                            onClick={aceitar}
+                                          >
+                                            <i className="fa-solid fa-circle-check check-setor"></i>
+                                          </button>
+                                          <button
+                                            className="div-reject ms-4"
+                                            onClick={handleShowRejeitar}
+                                          >
+                                            <i className="fa-solid fa-times-circle reject-setor"></i>
+                                          </button>
+                                          <Modal
+                                            size="lg"
+                                            show={showRejeitar}
+                                            onHide={handleCloseRejeitar}
+                                          >
+                                            <Modal.Header closeButton>
+                                              <Modal.Title>
+                                                Justificativa rejeição setor{" "}
+                                                {value}:
+                                              </Modal.Title>
+                                            </Modal.Header>
+                                            <form>
+                                              <Modal.Body>
+                                                <label
+                                                  htmlFor="justificativa"
+                                                  className="pt-3"
+                                                >
+                                                  Justificativa:
+                                                </label>
+                                                <textarea
                                                   id=""
+                                                  name="justificativa"
+                                                  className="input-objetivo"
+                                                  value={justificativaRejeitar}
                                                   onChange={(e) =>
-                                                    convertFile(
-                                                      e.target.files,
+                                                    setJustificativaRejeitar(
                                                       e.target.value
                                                     )
                                                   }
+                                                  required
                                                 />
-                                              </label>
-                                            </Modal.Body>
-                                            <Modal.Footer>
-                                              <Button
-                                                variant="secondary"
-                                                onClick={handleCloseRejeitar}
-                                              >
-                                                Cancelar
-                                              </Button>
-                                              <Button
-                                                type="submit"
-                                                variant="warning"
-                                                onClick={rejeitar}
-                                              >
-                                                Salvar
-                                              </Button>
-                                            </Modal.Footer>
-                                          </form>
-                                        </Modal>
+                                                <label
+                                                  className="mt-3"
+                                                  htmlFor="documentos"
+                                                >
+                                                  Documentos:
+                                                </label>
+                                                <div className="input-documentos d-flex">
+                                                  {documento_anexoRejeitar.length >
+                                                  0 ? (
+                                                    <>
+                                                      {documento_anexoRejeitar.map(
+                                                        (value, index) => (
+                                                          <>
+                                                            {value.indexOf(
+                                                              "image/"
+                                                            ) > -1 ? (
+                                                              <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                                <i className="far fa-file-image download position-relative">
+                                                                  <button
+                                                                    onClick={(
+                                                                      e
+                                                                    ) =>
+                                                                      excluir_arquivo(
+                                                                        index,
+                                                                        e
+                                                                      )
+                                                                    }
+                                                                    className="botao-excluir-arquivo"
+                                                                  >
+                                                                    <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                                  </button>
+                                                                </i>
+                                                                <p className="texto-usuario">
+                                                                  {
+                                                                    nomedocumentoRejeitar[
+                                                                      index
+                                                                    ]
+                                                                  }
+                                                                </p>
+                                                              </div>
+                                                            ) : null}
+                                                            {value.indexOf(
+                                                              "application/pdf"
+                                                            ) > -1 ? (
+                                                              <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                                <i className="far fa-file-pdf download position-relative">
+                                                                  <button
+                                                                    onClick={(
+                                                                      e
+                                                                    ) =>
+                                                                      excluir_arquivo(
+                                                                        index,
+                                                                        e
+                                                                      )
+                                                                    }
+                                                                    className="botao-excluir-arquivo"
+                                                                  >
+                                                                    <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                                  </button>
+                                                                </i>
+                                                                <p className="texto-usuario">
+                                                                  {
+                                                                    nomedocumentoRejeitar[
+                                                                      index
+                                                                    ]
+                                                                  }
+                                                                </p>
+                                                              </div>
+                                                            ) : null}
+                                                            {value.indexOf(
+                                                              "application/msword"
+                                                            ) > -1 ? (
+                                                              <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                                <i className="far fa-file-word download position-relative">
+                                                                  <button
+                                                                    onClick={(
+                                                                      e
+                                                                    ) =>
+                                                                      excluir_arquivo(
+                                                                        index,
+                                                                        e
+                                                                      )
+                                                                    }
+                                                                    className="botao-excluir-arquivo"
+                                                                  >
+                                                                    <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                                  </button>
+                                                                </i>
+                                                                <p className="texto-usuario">
+                                                                  {
+                                                                    nomedocumentoRejeitar[
+                                                                      index
+                                                                    ]
+                                                                  }
+                                                                </p>
+                                                              </div>
+                                                            ) : null}
+                                                            {value.indexOf(
+                                                              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                            ) > -1 ? (
+                                                              <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                                <i className="far fa-file-excel download position-relative">
+                                                                  <button
+                                                                    onClick={(
+                                                                      e
+                                                                    ) =>
+                                                                      excluir_arquivo(
+                                                                        index,
+                                                                        e
+                                                                      )
+                                                                    }
+                                                                    className="botao-excluir-arquivo"
+                                                                  >
+                                                                    <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                                  </button>
+                                                                </i>
+                                                                <p className="texto-usuario">
+                                                                  {
+                                                                    nomedocumentoRejeitar[
+                                                                      index
+                                                                    ]
+                                                                  }
+                                                                </p>
+                                                              </div>
+                                                            ) : null}
+                                                            {value.indexOf(
+                                                              "text/plain"
+                                                            ) > -1 ? (
+                                                              <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                                                                <i className="far fa-file-lines download position-relative">
+                                                                  <button
+                                                                    onClick={(
+                                                                      e
+                                                                    ) =>
+                                                                      excluir_arquivo(
+                                                                        index,
+                                                                        e
+                                                                      )
+                                                                    }
+                                                                    className="botao-excluir-arquivo"
+                                                                  >
+                                                                    <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                                                  </button>
+                                                                </i>
+                                                                <p className="texto-usuario">
+                                                                  {
+                                                                    nomedocumentoRejeitar[
+                                                                      index
+                                                                    ]
+                                                                  }
+                                                                </p>
+                                                              </div>
+                                                            ) : null}
+                                                          </>
+                                                        )
+                                                      )}
+                                                    </>
+                                                  ) : null}
+                                                </div>
+                                                <br />
+                                                <label
+                                                  htmlFor=""
+                                                  className="anexar ms-3"
+                                                >
+                                                  <i className="fa-solid fa-upload"></i>
+                                                  Anexar documentos
+                                                  <input
+                                                    type="file"
+                                                    name=""
+                                                    id=""
+                                                    onChange={(e) =>
+                                                      convertFile(
+                                                        e.target.files,
+                                                        e.target.value
+                                                      )
+                                                    }
+                                                  />
+                                                </label>
+                                              </Modal.Body>
+                                              <Modal.Footer>
+                                                <Button
+                                                  variant="secondary"
+                                                  onClick={handleCloseRejeitar}
+                                                >
+                                                  Cancelar
+                                                </Button>
+                                                <Button
+                                                  type="submit"
+                                                  variant="warning"
+                                                  onClick={rejeitar}
+                                                >
+                                                  Salvar
+                                                </Button>
+                                              </Modal.Footer>
+                                            </form>
+                                          </Modal>
+                                        </div>
                                       </div>
-                                    </div>
-                                  </>
-                                ) : (
-                                  <>
-                                    <h6 className="ps-3 pt-2">{value}:</h6>
-                                    <div className="ps-3 d-flex justify-content-center">
-                                      <div className="pt-2 mb-2 d-flex">
-                                        <i className="fa-solid fa-circle pending-setor">
-                                          <i className="fa-solid fa-ellipsis pending-setor-dots"></i>
-                                        </i>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <h6 className="ps-3 pt-2">{value}:</h6>
+                                      <div className="ps-3 d-flex justify-content-center">
+                                        <div className="pt-2 mb-2 d-flex">
+                                          <i className="fa-solid fa-circle pending-setor">
+                                            <i className="fa-solid fa-ellipsis pending-setor-dots"></i>
+                                          </i>
+                                        </div>
                                       </div>
+                                    </>
+                                  )}
+                                </>
+                              ) : (
+                                <>
+                                  <h6 className="ps-3 pt-2">{value}:</h6>
+                                  <div className="ps-3 d-flex justify-content-center">
+                                    <div className="pt-2 mb-2 d-flex">
+                                      <i className="fa-solid fa-times-circle reject-setor"></i>
                                     </div>
-                                  </>
+                                  </div>
+                                </>
+                              )}
+                            </>
+                          )}
+                        </>
+                      ))}
+                    </div>
+                    {listaSistemas.length > 0 ? (
+                      <div className="div-usuario mt-2">
+                        <h6 className="pt-3">Sistemas envolvidos:</h6>
+                        <ul>
+                          {listaSistemas.map((value: string) => (
+                            <li className="mt-2">{value}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                    <div>
+                      <h6 className="pt-3">Documentos:</h6>
+                      <div className="ms-3 documentos">
+                        {listaArquivos.length > 0 ? (
+                          <div className="d-flex">
+                            {listaArquivos.map((value, index) => (
+                              <>
+                                {value.indexOf("image/") > -1 && (
+                                  <a
+                                    href={value}
+                                    download={listaNomesArquivos[index]}
+                                    className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                  >
+                                    <i className="far fa-file-image download"></i>
+                                    <p className="texto-usuario">
+                                      {listaNomesArquivos[index]}
+                                    </p>
+                                  </a>
                                 )}
+                                {value.indexOf("application/pdf") > -1 && (
+                                  <a
+                                    href={value}
+                                    download={listaNomesArquivos[index]}
+                                    className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                  >
+                                    <i className="far fa-file-pdf download"></i>
+                                    <p className="texto-usuario">
+                                      {listaNomesArquivos[index]}
+                                    </p>
+                                  </a>
+                                )}
+                                {value.indexOf("application/msword") > -1 && (
+                                  <a
+                                    href={value}
+                                    download={listaNomesArquivos[index]}
+                                    className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                  >
+                                    <i className="far fa-file-word download"></i>
+                                    <p className="texto-usuario">
+                                      {listaNomesArquivos[index]}
+                                    </p>
+                                  </a>
+                                )}
+                                {value.indexOf(
+                                  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                ) > -1 && (
+                                  <a
+                                    href={value}
+                                    download={listaNomesArquivos[index]}
+                                    className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                  >
+                                    <i className="far fa-file-excel download"></i>
+                                    <p className="texto-usuario">
+                                      {listaNomesArquivos[index]}
+                                    </p>
+                                  </a>
+                                )}
+                                {value.indexOf("text/plain") > -1 && (
+                                  <a
+                                    href={value}
+                                    download={listaNomesArquivos[index]}
+                                    className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
+                                  >
+                                    <i className="far fa-file-lines download"></i>
+                                    <p className="texto-usuario">
+                                      {listaNomesArquivos[index]}
+                                    </p>
+                                  </a>
+                                )}
+                              </>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="texto-usuario text-center">
+                            Nenhum anexo para esta CRM
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-6">
+                    <div className="mb-4">
+                      <h6 className="pt-3">Impacto:</h6>
+                      <div className="texto-usuario ps-3">
+                        {impacto.length > 680 ? (
+                          <>
+                            {impactoFormatado}
+                            <button
+                              className="botao-arquivos ver-mais ps-1"
+                              onClick={handleShowImpacto}
+                            >
+                              ver mais...
+                            </button>
+                          </>
+                        ) : (
+                          <>{impacto}</>
+                        )}
+                        <Modal
+                          size="xl"
+                          show={showImpacto}
+                          onHide={handleCloseImpacto}
+                        >
+                          <Modal.Header closeButton>
+                            <Modal.Title>Impacto:</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>{impacto}</Modal.Body>
+                          <Modal.Footer>
+                            <Button
+                              variant="warning"
+                              onClick={handleCloseImpacto}
+                            >
+                              OK
+                            </Button>
+                          </Modal.Footer>
+                        </Modal>
+                      </div>
+                      <h6 className="pt-3">Descrição:</h6>
+                      <div className="texto-usuario ps-3">
+                        {descricao.length > 680 ? (
+                          <>
+                            {descricaoFormatado}
+                            <button
+                              className="botao-arquivos ver-mais ps-1"
+                              onClick={handleShowDescricao}
+                            >
+                              ver mais...
+                            </button>
+                          </>
+                        ) : (
+                          <>{descricao}</>
+                        )}
+                        <Modal
+                          size="xl"
+                          show={showDescricao}
+                          onHide={handleCloseDescricao}
+                        >
+                          <Modal.Header closeButton>
+                            <Modal.Title>Descrição:</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>{descricao}</Modal.Body>
+                          <Modal.Footer>
+                            <Button
+                              variant="warning"
+                              onClick={handleCloseDescricao}
+                            >
+                              OK
+                            </Button>
+                          </Modal.Footer>
+                        </Modal>
+                      </div>
+                      <h6 className="pt-3">Objetivo:</h6>
+                      <div className="texto-usuario ps-3">
+                        {objetivo.length > 680 ? (
+                          <>
+                            {objetivoFormatado}
+                            <button
+                              className="botao-arquivos ver-mais ps-1"
+                              onClick={handleShowObjetivo}
+                            >
+                              ver mais...
+                            </button>
+                          </>
+                        ) : (
+                          <>{objetivo}</>
+                        )}
+                        <Modal
+                          size="xl"
+                          show={showObjetivo}
+                          onHide={handleCloseObjetivo}
+                        >
+                          <Modal.Header closeButton>
+                            <Modal.Title>Objetivo:</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>{objetivo}</Modal.Body>
+                          <Modal.Footer>
+                            <Button
+                              variant="warning"
+                              onClick={handleCloseObjetivo}
+                            >
+                              OK
+                            </Button>
+                          </Modal.Footer>
+                        </Modal>
+                      </div>
+                      <h6 className="pt-3">Justificativa:</h6>
+                      <div className="texto-usuario ps-3">
+                        {justificativa.length > 680 ? (
+                          <>
+                            {justificativaFormatado}
+                            <button
+                              className="botao-arquivos ver-mais ps-1"
+                              onClick={handleShowJustificativa}
+                            >
+                              ver mais...
+                            </button>
+                          </>
+                        ) : (
+                          <>{justificativa}</>
+                        )}
+                        <Modal
+                          size="xl"
+                          show={showJustificativa}
+                          onHide={handleCloseJustificativa}
+                        >
+                          <Modal.Header closeButton>
+                            <Modal.Title>Justificativa:</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>{justificativa}</Modal.Body>
+                          <Modal.Footer>
+                            <Button
+                              variant="warning"
+                              onClick={handleCloseJustificativa}
+                            >
+                              OK
+                            </Button>
+                          </Modal.Footer>
+                        </Modal>
+                      </div>
+
+                      <div className="texto-usuario">
+                        {alternativas ? (
+                          <>
+                            <h6 className="pt-3">Alternativas:</h6>
+                            {alternativas.length > 680 ? (
+                              <>
+                                <p className="ps-3">{alternativasFormatado}</p>
+                                <button
+                                  className="botao-arquivos ver-mais ps-1"
+                                  onClick={handleShowAlternativas}
+                                >
+                                  ver mais...
+                                </button>
                               </>
                             ) : (
                               <>
-                                <h6 className="ps-3 pt-2">{value}:</h6>
-                                <div className="ps-3 d-flex justify-content-center">
-                                  <div className="pt-2 mb-2 d-flex">
-                                    <i className="fa-solid fa-times-circle reject-setor"></i>
-                                  </div>
-                                </div>
+                                <p className="ps-3">{alternativas}</p>
                               </>
                             )}
                           </>
-                        )}
-                      </>
-                    ))}
-                  </div>
-                  {listaSistemas.length > 0 ? (
-                    <div className="div-usuario mt-2">
-                      <h6 className="pt-3">Sistemas envolvidos:</h6>
-                      <ul>
-                        {listaSistemas.map((value: string) => (
-                          <li className="mt-2">{value}</li>
-                        ))}
-                      </ul>
+                        ) : null}
+                        <Modal
+                          size="xl"
+                          show={showAlternativas}
+                          onHide={handleCloseAlternativas}
+                        >
+                          <Modal.Header closeButton>
+                            <Modal.Title>Alternativas:</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>{alternativas}</Modal.Body>
+                          <Modal.Footer>
+                            <Button
+                              variant="warning"
+                              onClick={handleCloseAlternativas}
+                            >
+                              OK
+                            </Button>
+                          </Modal.Footer>
+                        </Modal>
+                      </div>
+
+                      <div className="texto-usuario ps-3 mb-4">
+                        {comportamento_offline ? (
+                          <>
+                            <h6 className="pt-3">Comportamento Offline:</h6>
+                            {comportamento_offline.length > 280 ? (
+                              <>
+                                {comportamentoFormatado}
+                                <button
+                                  className="botao-arquivos ver-mais ps-1"
+                                  onClick={handleShowComportamento}
+                                >
+                                  ver mais...
+                                </button>
+                              </>
+                            ) : (
+                              <>{comportamento_offline}</>
+                            )}
+                          </>
+                        ) : null}
+                        <Modal
+                          size="xl"
+                          show={showComportamento}
+                          onHide={handleCloseComportamento}
+                        >
+                          <Modal.Header closeButton>
+                            <Modal.Title>Comportamento Offline:</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>{comportamento_offline}</Modal.Body>
+                          <Modal.Footer>
+                            <Button
+                              variant="warning"
+                              onClick={handleCloseComportamento}
+                            >
+                              OK
+                            </Button>
+                          </Modal.Footer>
+                        </Modal>
+                      </div>
                     </div>
-                  ) : null}
-                  <div>
-                    <h6 className="pt-3">Documentos:</h6>
-                    <div className="ms-3 documentos">
-                      {listaArquivos.length > 0 ? (
-                        <div className="d-flex">
-                          {listaArquivos.map((value, index) => (
-                            <>
-                              {value.indexOf("image/") > -1 && (
-                                <a
-                                  href={value}
-                                  download={listaNomesArquivos[index]}
-                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                                >
-                                  <i className="far fa-file-image download"></i>
-                                  <p className="texto-usuario">
-                                    {listaNomesArquivos[index]}
-                                  </p>
-                                </a>
-                              )}
-                              {value.indexOf("application/pdf") > -1 && (
-                                <a
-                                  href={value}
-                                  download={listaNomesArquivos[index]}
-                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                                >
-                                  <i className="far fa-file-pdf download"></i>
-                                  <p className="texto-usuario">
-                                    {listaNomesArquivos[index]}
-                                  </p>
-                                </a>
-                              )}
-                              {value.indexOf("application/msword") > -1 && (
-                                <a
-                                  href={value}
-                                  download={listaNomesArquivos[index]}
-                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                                >
-                                  <i className="far fa-file-word download"></i>
-                                  <p className="texto-usuario">
-                                    {listaNomesArquivos[index]}
-                                  </p>
-                                </a>
-                              )}
-                              {value.indexOf(
-                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                              ) > -1 && (
-                                <a
-                                  href={value}
-                                  download={listaNomesArquivos[index]}
-                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                                >
-                                  <i className="far fa-file-excel download"></i>
-                                  <p className="texto-usuario">
-                                    {listaNomesArquivos[index]}
-                                  </p>
-                                </a>
-                              )}
-                              {value.indexOf("text/plain") > -1 && (
-                                <a
-                                  href={value}
-                                  download={listaNomesArquivos[index]}
-                                  className="ms-3 mt-3 pt-2 d-flex flex-column align-items-center arquivos text-center"
-                                >
-                                  <i className="far fa-file-lines download"></i>
-                                  <p className="texto-usuario">
-                                    {listaNomesArquivos[index]}
-                                  </p>
-                                </a>
-                              )}
-                            </>
-                          ))}
+                  </div>
+                  <div className="col-2">
+                    <h6 className="pt-3">Versão:</h6>
+                    <div className="texto-bold d-flex justify-content-end">
+                      <div className="ps-3">v{versao_crm}</div>
+                      {versao_crm > 1 ? (
+                        <button
+                          onClick={search}
+                          className="texto-bold versao ps-3"
+                        >
+                          <i className="fa-solid fa-angles-right"></i>
+                        </button>
+                      ) : null}
+                    </div>
+                    <h6 className="pt-3">Data Criação:</h6>
+                    <div className="texto-usuario d-flex justify-content-end">
+                      {data}
+                    </div>
+                    {data_obrigatoriedade ? (
+                      <>
+                        <h6 className="mt-4">Data Obrigat. Legal:</h6>
+                        <div className="texto-usuario d-flex justify-content-end">
+                          {data_obr}
                         </div>
-                      ) : (
-                        <p className="texto-usuario text-center">
-                          Nenhum anexo para esta CRM
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="col-6">
-                  <div className="mb-4">
-                    <h6 className="pt-3">Impacto:</h6>
-                    <div className="texto-usuario ps-3">
-                      {impacto.length > 680 ? (
-                        <>
-                          {impactoFormatado}
-                          <button
-                            className="botao-arquivos ver-mais ps-1"
-                            onClick={handleShowImpacto}
-                          >
-                            ver mais...
-                          </button>
-                        </>
-                      ) : (
-                        <>{impacto}</>
-                      )}
-                      <Modal
-                        size="xl"
-                        show={showImpacto}
-                        onHide={handleCloseImpacto}
-                      >
-                        <Modal.Header closeButton>
-                          <Modal.Title>Impacto:</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>{impacto}</Modal.Body>
-                        <Modal.Footer>
-                          <Button
-                            variant="warning"
-                            onClick={handleCloseImpacto}
-                          >
-                            OK
-                          </Button>
-                        </Modal.Footer>
-                      </Modal>
-                    </div>
-                    <h6 className="pt-3">Descrição:</h6>
-                    <div className="texto-usuario ps-3">
-                      {descricao.length > 680 ? (
-                        <>
-                          {descricaoFormatado}
-                          <button
-                            className="botao-arquivos ver-mais ps-1"
-                            onClick={handleShowDescricao}
-                          >
-                            ver mais...
-                          </button>
-                        </>
-                      ) : (
-                        <>{descricao}</>
-                      )}
-                      <Modal
-                        size="xl"
-                        show={showDescricao}
-                        onHide={handleCloseDescricao}
-                      >
-                        <Modal.Header closeButton>
-                          <Modal.Title>Descrição:</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>{descricao}</Modal.Body>
-                        <Modal.Footer>
-                          <Button
-                            variant="warning"
-                            onClick={handleCloseDescricao}
-                          >
-                            OK
-                          </Button>
-                        </Modal.Footer>
-                      </Modal>
-                    </div>
-                    <h6 className="pt-3">Objetivo:</h6>
-                    <div className="texto-usuario ps-3">
-                      {objetivo.length > 680 ? (
-                        <>
-                          {objetivoFormatado}
-                          <button
-                            className="botao-arquivos ver-mais ps-1"
-                            onClick={handleShowObjetivo}
-                          >
-                            ver mais...
-                          </button>
-                        </>
-                      ) : (
-                        <>{objetivo}</>
-                      )}
-                      <Modal
-                        size="xl"
-                        show={showObjetivo}
-                        onHide={handleCloseObjetivo}
-                      >
-                        <Modal.Header closeButton>
-                          <Modal.Title>Objetivo:</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>{objetivo}</Modal.Body>
-                        <Modal.Footer>
-                          <Button
-                            variant="warning"
-                            onClick={handleCloseObjetivo}
-                          >
-                            OK
-                          </Button>
-                        </Modal.Footer>
-                      </Modal>
-                    </div>
-                    <h6 className="pt-3">Justificativa:</h6>
-                    <div className="texto-usuario ps-3">
-                      {justificativa.length > 680 ? (
-                        <>
-                          {justificativaFormatado}
-                          <button
-                            className="botao-arquivos ver-mais ps-1"
-                            onClick={handleShowJustificativa}
-                          >
-                            ver mais...
-                          </button>
-                        </>
-                      ) : (
-                        <>{justificativa}</>
-                      )}
-                      <Modal
-                        size="xl"
-                        show={showJustificativa}
-                        onHide={handleCloseJustificativa}
-                      >
-                        <Modal.Header closeButton>
-                          <Modal.Title>Justificativa:</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>{justificativa}</Modal.Body>
-                        <Modal.Footer>
-                          <Button
-                            variant="warning"
-                            onClick={handleCloseJustificativa}
-                          >
-                            OK
-                          </Button>
-                        </Modal.Footer>
-                      </Modal>
-                    </div>
-
-                    <div className="texto-usuario">
-                      {alternativas ? (
-                        <>
-                          <h6 className="pt-3">Alternativas:</h6>
-                          {alternativas.length > 680 ? (
-                            <>
-                              <p className="ps-3">{alternativasFormatado}</p>
-                              <button
-                                className="botao-arquivos ver-mais ps-1"
-                                onClick={handleShowAlternativas}
+                      </>
+                    ) : null}
+                    {numero_crm_dependencia ? (
+                      <>
+                        <h6 className="mt-4">Número CRM dependente:</h6>
+                        <div className="texto-usuario d-flex justify-content-end">
+                          {("00000" + numero_crm_dependencia).slice(-5)}
+                        </div>
+                      </>
+                    ) : null}
+                    {complexidade === 0 && setorUsuario === "TI" ? (
+                      <>
+                        <form>
+                          <h6 className="pt-3">Complexidade:</h6>
+                          <div className="d-flex justify-content-end">
+                            <select
+                              name="complexidade"
+                              id="complexidade"
+                              className="text-center"
+                              onChange={(e) =>
+                                setComplexidadeUpdate(Number(e.target.value))
+                              }
+                            >
+                              <option
+                                className="zero"
+                                value="0"
+                                disabled
+                                selected
                               >
-                                ver mais...
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <p className="ps-3">{alternativas}</p>
-                            </>
-                          )}
-                        </>
-                      ) : null}
-                      <Modal
-                        size="xl"
-                        show={showAlternativas}
-                        onHide={handleCloseAlternativas}
-                      >
-                        <Modal.Header closeButton>
-                          <Modal.Title>Alternativas:</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>{alternativas}</Modal.Body>
-                        <Modal.Footer>
-                          <Button
-                            variant="warning"
-                            onClick={handleCloseAlternativas}
-                          >
-                            OK
-                          </Button>
-                        </Modal.Footer>
-                      </Modal>
-                    </div>
-
-                    <div className="texto-usuario ps-3 mb-4">
-                      {comportamento_offline ? (
-                        <>
-                          <h6 className="pt-3">Comportamento Offline:</h6>
-                          {comportamento_offline.length > 280 ? (
-                            <>
-                              {comportamentoFormatado}
-                              <button
-                                className="botao-arquivos ver-mais ps-1"
-                                onClick={handleShowComportamento}
-                              >
-                                ver mais...
-                              </button>
-                            </>
-                          ) : (
-                            <>{comportamento_offline}</>
-                          )}
-                        </>
-                      ) : null}
-                      <Modal
-                        size="xl"
-                        show={showComportamento}
-                        onHide={handleCloseComportamento}
-                      >
-                        <Modal.Header closeButton>
-                          <Modal.Title>Comportamento Offline:</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>{comportamento_offline}</Modal.Body>
-                        <Modal.Footer>
-                          <Button
-                            variant="warning"
-                            onClick={handleCloseComportamento}
-                          >
-                            OK
-                          </Button>
-                        </Modal.Footer>
-                      </Modal>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-2">
-                  <h6 className="pt-3">Versão:</h6>
-                  <div className="texto-bold d-flex justify-content-end">
-                    <div className="ps-3">v{versao_crm}</div>
-                    {versao_crm > 1 ? (
-                      <button
-                        onClick={search}
-                        className="texto-bold versao ps-3"
-                      >
-                        <i className="fa-solid fa-angles-right"></i>
-                      </button>
+                                . . .
+                              </option>
+                              <option className="muito-baixa" value="1">
+                                MUITO BAIXA
+                              </option>
+                              <option className="baixa" value="2">
+                                BAIXA
+                              </option>
+                              <option className="media" value="3">
+                                MÉDIA
+                              </option>
+                              <option className="alta" value="4">
+                                ALTA
+                              </option>
+                              <option className="muito-alta" value="5">
+                                MUITO ALTA
+                              </option>
+                            </select>
+                          </div>
+                          <label htmlFor="impacto_ti">
+                            Impacto da mudança:
+                          </label>
+                          <textarea
+                            name="impacto_ti"
+                            id=""
+                            className="input-impacto_ti texto-usuario"
+                            value={impactoTI}
+                            onChange={(e) => setImpactoTI(e.target.value)}
+                          />
+                          <div className="d-flex justify-content-end">
+                            <button
+                              className="salvar_ti ps-3 pe-3"
+                              onClick={salvarDetalhesTI}
+                            >
+                              Salvar
+                            </button>
+                          </div>
+                        </form>
+                      </>
+                    ) : (
+                      <>
+                        <h6 className="pt-3">Complexidade:</h6>
+                        <div className="texto-usuario d-flex justify-content-end">
+                          {switchComplexidade(complexidade)}
+                        </div>
+                        {impacto_ti ? (
+                          <>
+                            <h6 className="pt-3">Impacto da mudança:</h6>
+                            {impacto_ti.length > 200 ? (
+                              <div className="texto-usuario text-end">
+                                {impactoTIFormatado}
+                                <button
+                                  className="botao-arquivos ver-mais ps-1"
+                                  onClick={handleShowImpactoTI}
+                                >
+                                  ver mais...
+                                </button>
+                                <Modal
+                                  size="xl"
+                                  show={showImpactoTI}
+                                  onHide={handleCloseImpactoTI}
+                                >
+                                  <Modal.Header closeButton>
+                                    <Modal.Title>
+                                      Impacto da mudança:
+                                    </Modal.Title>
+                                  </Modal.Header>
+                                  <Modal.Body>{impacto_ti}</Modal.Body>
+                                  <Modal.Footer>
+                                    <Button
+                                      variant="warning"
+                                      onClick={handleCloseImpactoTI}
+                                    >
+                                      OK
+                                    </Button>
+                                  </Modal.Footer>
+                                </Modal>
+                              </div>
+                            ) : (
+                              <>
+                                <p className="texto-usuario text-end">
+                                  {impacto_ti}
+                                </p>
+                              </>
+                            )}
+                          </>
+                        ) : null}
+                      </>
+                    )}
+                    {data_arquivamento ? (
+                      <>
+                        <h6 className="pt-3">Data Arquivamento:</h6>
+                        <div className="texto-usuario d-flex justify-content-end">
+                          {data_arq}
+                        </div>
+                      </>
                     ) : null}
                   </div>
-                  <h6 className="pt-3">Data Criação:</h6>
-                  <div className="texto-usuario d-flex justify-content-end">
-                    {data}
-                  </div>
-                  {data_obrigatoriedade ? (
-                    <>
-                      <h6 className="mt-4">Data Obrigat. Legal:</h6>
-                      <div className="texto-usuario d-flex justify-content-end">
-                        {data_obr}
-                      </div>
-                    </>
-                  ) : null}
-                  {numero_crm_dependencia ? (
-                    <>
-                      <h6 className="mt-4">Número CRM dependente:</h6>
-                      <div className="texto-usuario d-flex justify-content-end">
-                        {("00000" + numero_crm_dependencia).slice(-5)}
-                      </div>
-                    </>
-                  ) : null}
-                  {complexidade === 0 && setorUsuario === "TI" ? (
-                    <>
-                      <form>
-                        <h6 className="pt-3">Complexidade:</h6>
-                        <div className="d-flex justify-content-end">
-                          <select
-                            name="complexidade"
-                            id="complexidade"
-                            className="text-center"
-                            onChange={(e) =>
-                              setComplexidadeUpdate(Number(e.target.value))
-                            }
-                          >
-                            <option
-                              className="zero"
-                              value="0"
-                              disabled
-                              selected
-                            >
-                              . . .
-                            </option>
-                            <option className="muito-baixa" value="1">
-                              MUITO BAIXA
-                            </option>
-                            <option className="baixa" value="2">
-                              BAIXA
-                            </option>
-                            <option className="media" value="3">
-                              MÉDIA
-                            </option>
-                            <option className="alta" value="4">
-                              ALTA
-                            </option>
-                            <option className="muito-alta" value="5">
-                              MUITO ALTA
-                            </option>
-                          </select>
-                        </div>
-                        <label htmlFor="impacto_ti">Impacto da mudança:</label>
-                        <textarea
-                          name="impacto_ti"
-                          id=""
-                          className="input-impacto_ti texto-usuario"
-                          value={impactoTI}
-                          onChange={(e) => setImpactoTI(e.target.value)}
-                        />
-                        <div className="d-flex justify-content-end">
-                          <button
-                            className="salvar_ti ps-3 pe-3"
-                            onClick={salvarDetalhesTI}
-                          >
-                            Salvar
-                          </button>
-                        </div>
-                      </form>
-                    </>
-                  ) : (
-                    <>
-                      <h6 className="pt-3">Complexidade:</h6>
-                      <div className="texto-usuario d-flex justify-content-end">
-                        {switchComplexidade(complexidade)}
-                      </div>
-                      {impacto_ti ? (
-                        <>
-                          <h6 className="pt-3">Impacto da mudança:</h6>
-                          {impacto_ti.length > 200 ? (
-                            <div className="texto-usuario text-end">
-                              {impactoTIFormatado}
-                              <button
-                                className="botao-arquivos ver-mais ps-1"
-                                onClick={handleShowImpactoTI}
-                              >
-                                ver mais...
-                              </button>
-                              <Modal
-                                size="xl"
-                                show={showImpactoTI}
-                                onHide={handleCloseImpactoTI}
-                              >
-                                <Modal.Header closeButton>
-                                  <Modal.Title>Impacto da mudança:</Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body>{impacto_ti}</Modal.Body>
-                                <Modal.Footer>
-                                  <Button
-                                    variant="warning"
-                                    onClick={handleCloseImpactoTI}
-                                  >
-                                    OK
-                                  </Button>
-                                </Modal.Footer>
-                              </Modal>
-                            </div>
-                          ) : (
-                            <>
-                              <p className="texto-usuario text-end">
-                                {impacto_ti}
-                              </p>
-                            </>
-                          )}
-                        </>
-                      ) : null}
-                    </>
-                  )}
-                  {data_arquivamento ? (
-                    <>
-                      <h6 className="pt-3">Data Arquivamento:</h6>
-                      <div className="texto-usuario d-flex justify-content-end">
-                        {data_arq}
-                      </div>
-                    </>
-                  ) : null}
                 </div>
-              </div>
-            </section>
+              </section>
+            </div>
           </div>
         </div>
-      </div>
-    </AccordionStyled>
+      </AccordionStyled>
+      <ToastContainer className="p-3" position="middle-center">
+        <Toast show={showA} bg="warning">
+          <Toast.Body className="d-flex justify-content-around align-items-center">
+            {showTextoA}
+            <Button variant="secondary" onClick={() => closeToastA()}>
+              OK
+            </Button>
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
+      <ToastContainer className="p-3" position="middle-center">
+        <Toast show={showB} bg="warning">
+          <Toast.Body className="d-flex justify-content-around align-items-center">
+            Para rejeitar é necessário uma justificativa
+            <Button variant="secondary" onClick={() => setShowB(false)}>
+              OK
+            </Button>
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
+    </>
   );
 };
 

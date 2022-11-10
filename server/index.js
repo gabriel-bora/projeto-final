@@ -161,6 +161,24 @@ const Aceite = sequelize.define(
   }
 );
 
+const Notificacoe = sequelize.define(
+  "Notificacoe",
+  {
+    idNotificacao: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
+    nome_remetente: DataTypes.STRING,
+    matricula_destinatario: DataTypes.STRING,
+    informacao: DataTypes.STRING,
+    id_crm: DataTypes.NUMBER,
+    versao_crm: DataTypes.NUMBER,
+  },
+  {
+    timestamps: false,
+  }
+);
+
 app.post("/login", (req, res) => {
   Colaborador.findOne({ where: { matricula: req.body.matricula } }).then(
     (data) => {
@@ -394,8 +412,50 @@ app.post("/emailCRM", (req, res) => {
           .sendMail({
             from: "Status CRM QQ <statuscrm.queroquero@gmail.com>",
             to: data[0][0].email,
-            subject: `${req.body.usuario} criou a CRM ${req.body.crm} v${req.body.versao} e o seu setor está envolvido nela`,
-            html: "Verifique a CRM dentro da <a href='http://localhost:3000/projeto-final-crm'>aplicação</a>.",
+            subject: `${req.body.usuario} criou a CRM ${req.body.crm} v${req.body.versao}`,
+            html: `<div style="width: 600px; height: 200px; border: 1px solid #216800">
+            <div
+              style="
+              width: 600px; height: 80px; background-color: #216800
+              "
+            >
+              <img
+                src="https://seeklogo.com/images/Q/Quero_Quero-logo-523B9438CE-seeklogo.com.png"
+                alt=""
+                style="width: auto;
+                height: 50px;
+                margin-left: 230px;
+                margin-top: 15px;"
+              />
+            </div>
+            <div
+              style="
+                width: 600px;
+                height: 80px;
+                background-color: #fff;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              "
+            >
+              <p
+                style="
+                font-size: 20px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin-left: 145px;
+                margin-top: 18px;
+                text-align: center;
+                "
+              >
+                ${req.body.usuario} criou a CRM ${req.body.crm} v${req.body.versao}
+                <br />
+                Seu setor está envolvido nela.
+                <br />
+                Verifique a CRM dentro da
+                <a href="http://localhost:3000/projeto-final-crm">aplicação</a>.
+              </p>
+            </div>
+          </div>`,
           })
           .then((message) => {
             console.log(message);
@@ -412,8 +472,39 @@ app.post("/emailAccept", (req, res) => {
     .sendMail({
       from: "Status CRM QQ <statuscrm.queroquero@gmail.com>",
       to: req.body.email,
-      subject: `${req.body.usuario} ${req.body.mensagem} a CRM ${req.body.crm} v${req.body.versao} que você é o responsável`,
-      html: "Verifique a CRM dentro da <a href='http://localhost:3000/projeto-final-crm'>aplicação</a>.",
+      subject: `${req.body.usuario} ${req.body.mensagem} a CRM ${req.body.crm} v${req.body.versao}`,
+      html: `<div style="width: 600px; height: 200px; border: 1px solid #216800">
+      <div style="width: 600px; height: 80px; background-color: #216800">
+        <img
+          src="https://seeklogo.com/images/Q/Quero_Quero-logo-523B9438CE-seeklogo.com.png"
+          alt=""
+          style="
+            width: auto;
+            height: 50px;
+            margin-left: 230px;
+            margin-top: 15px;
+          "
+        />
+      </div>
+      <div style="width: 600px; height: 80px; background-color: #fff">
+        <p
+          style="
+            font-size: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-left: 10px;
+            margin-top: 18px;
+            text-align: center;
+          "
+        >
+        ${req.body.usuario} ${req.body.mensagem} a CRM ${req.body.crm} v${req.body.versao}
+          <br />
+          Você é o responsável por ela.
+          <br />
+          Verifique a CRM dentro da
+          <a href="http://localhost:3000/projeto-final-crm">aplicação</a>.
+        </p>
+      </div>
+    </div>`,
     })
     .then((message) => {
       console.log(message);

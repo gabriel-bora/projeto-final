@@ -11,7 +11,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import { styled } from "@mui/material/styles";
 import { autocompleteClasses } from "@mui/material/Autocomplete";
 import { useNavigate } from "react-router-dom";
-import e from "express";
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
+import Button from "react-bootstrap/Button";
 
 const Root = styled("div")(
   ({ theme }) => `
@@ -187,6 +189,24 @@ const Form: React.FC = () => {
   const showOrHide3 = () => setShowElement3(true);
   const showOrHide = () => setShowElement3(false);
 
+  const [showA, setShowA] = useState(false);
+  const [showTextoA, setShowTextoA] = useState<string>();
+  const toastA = (mensagem: string) => {
+    setShowTextoA(mensagem);
+    setShowA(true);
+  };
+  const closeToastA = () => {
+    setShowA(false);
+    navigate("/home");
+  };
+
+  const [showB, setShowB] = useState(false);
+  const [showTextoB, setShowTextoB] = useState<string>();
+  const toastB = (mensagem: string) => {
+    setShowTextoB(mensagem);
+    setShowB(true);
+  };
+
   const [nome, setNome] = useState<string>();
   const [id, setId] = useState<string>();
   const [telefone, setTelefone] = useState<string>();
@@ -269,9 +289,7 @@ const Form: React.FC = () => {
       justificativa === "" ||
       dependencia_outro_crm === undefined
     ) {
-      window.alert(
-        "Verifique se todos os campos necessários estão preenchidos"
-      );
+      toastB("Verifique se todos os campos necessários estão preenchidos");
       return;
     } else {
       let listaSetoresCheck: any = [];
@@ -302,7 +320,7 @@ const Form: React.FC = () => {
           data_inicio: today,
         })
         .then((response) => {
-          alert(response.data);
+          toastA(response.data);
         });
       axios
         .post("http://localhost:3001/emailCRM", {
@@ -312,7 +330,6 @@ const Form: React.FC = () => {
           setor: listaSetoresCheck,
         })
         .then((response) => console.log(response));
-      navigate("/home");
     }
   }
 
@@ -376,390 +393,420 @@ const Form: React.FC = () => {
   }
 
   return (
-    <FormStyled foto_perfil={foto}>
-      <section>
-        <div className="div-form mt-4">
-          <div className="posicao-form">
-            <form action="">
-              <h1>Número de cadastro da CRM:{idCRMDisplay}</h1>
-              <h3>Responsável:</h3>
-              <div className="div-usuario">
-                <div className="foto-usuario"></div>
-                <p className="texto-usuario ms-3">
-                  Nome: {nome}
-                  <br />
-                  Matrícula: {id}
-                  <br />
-                  Setor: {setor}
-                  <br />
-                  Telefone: {telefone}
-                  <br />
-                  E-mail: {email}
-                </p>
-              </div>
-              <Root>
-                <div {...getRootProps()} className="mt-3">
-                  <Label {...getInputLabelProps()}>Setores Envolvidos:</Label>
-                  <InputWrapper
-                    ref={setAnchorEl}
-                    className={focused ? "focused" : ""}
-                  >
-                    <input {...getInputProps()} />
-                    {value.map((option: FilmOptionType, index: number) => (
-                      <StyledTag
-                        label={option.setor}
-                        {...getTagProps({ index })}
-                      />
-                    ))}
-                  </InputWrapper>
-                </div>
-                {groupedOptions.length > 0 ? (
-                  <Listbox {...getListboxProps()}>
-                    {(groupedOptions as typeof listaSetores).map(
-                      (option, index) => (
-                        <li {...getOptionProps({ option, index })}>
-                          <span>{option.setor}</span>
-                          <CheckIcon fontSize="small" />
-                        </li>
-                      )
-                    )}
-                  </Listbox>
-                ) : null}
-              </Root>
-              <label htmlFor="necessidade" className="pt-3">
-                Necessidade:
-              </label>
-              <textarea
-                id=""
-                name="necessidade"
-                className="input-objetivo"
-                value={necessidade}
-                onChange={(e) => setNecessidade(e.target.value)}
-              />
-              <label htmlFor="impacto" className="pt-3">
-                Impacto:
-              </label>
-              <textarea
-                name="impacto"
-                id=""
-                className="input-objetivo"
-                value={impacto}
-                onChange={(e) => setImpacto(e.target.value)}
-              />
-              <label htmlFor="descricao" className="pt-3">
-                Descrição:
-              </label>
-              <textarea
-                name="descricao"
-                id=""
-                className="input-descricao"
-                value={descricao}
-                onChange={(e) => setDescricao(e.target.value)}
-              />
-              <label htmlFor="objetivo">Objetivo:</label>
-              <textarea
-                name="objetivo"
-                id=""
-                className="input-descricao"
-                value={objetivo}
-                onChange={(e) => setObjetivo(e.target.value)}
-              />
-              <label htmlFor="justificativa">Justificativa:</label>
-              <textarea
-                name="justificativa"
-                id=""
-                className="input-descricao"
-                value={justificativa}
-                onChange={(e) => setJustificativa(e.target.value)}
-              />
-              <label htmlFor="alternativa">Alternativas:</label>
-              <textarea
-                name="alternativa"
-                id=""
-                className="input-descricao"
-                value={alternativa}
-                onChange={(e) => setAlternativa(e.target.value)}
-              />
-              <div className="div-versao-data">
+    <>
+      <FormStyled foto_perfil={foto}>
+        <section>
+          <div className="div-form mt-4">
+            <div className="posicao-form">
+              <form action="">
+                <h1>Número de cadastro da CRM: {idCRMDisplay}</h1>
+                <h3>Responsável:</h3>
                 <div className="div-usuario">
-                  <p>Versão:</p>
-                  <p className="ps-2">v{versao}</p>
+                  <div className="foto-usuario"></div>
+                  <p className="texto-usuario ms-3">
+                    Nome: {nome}
+                    <br />
+                    Matrícula: {id}
+                    <br />
+                    Setor: {setor}
+                    <br />
+                    Telefone: {telefone}
+                    <br />
+                    E-mail: {email}
+                  </p>
                 </div>
-                <div className="div-usuario">
-                  <p>Data criação:</p>
-                  <p className="ps-2">{hoje}</p>
-                </div>
-              </div>
-              <label htmlFor="data-legal">
-                Data Obrigatoriedade Legal &#40;caso exista&#41;:
-              </label>
-              <input
-                type="date"
-                name="data-legal"
-                id=""
-                className="input-data-legal"
-                value={data_obrigatoriedade}
-                onChange={(e) => setData_obrigatoriedade(e.target.value)}
-              />
-              <br />
-              <h3 className="mt-3">Sistemas envolvidos na mudança:</h3>
-              <div className="d-flex justify-content-between">
-                <div>
-                  <label htmlFor="CLIQQ" className="label-checkbox">
-                    CLIQQ:
-                  </label>
-                  <input
-                    type="checkbox"
-                    name="CLIQQ"
-                    value="CLIQQ"
-                    id=""
-                    className="checkbox ms-1"
-                    onChange={(e) =>
-                      setSistemas_envolvidos(
-                        sistemas_envolvidos?.concat(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label htmlFor="PDV" className="label-checkbox">
-                    PDV:
-                  </label>
-                  <input
-                    type="checkbox"
-                    name="PDV"
-                    value="PDV"
-                    id=""
-                    className="checkbox ms-1"
-                    onChange={(e) =>
-                      setSistemas_envolvidos(
-                        sistemas_envolvidos?.concat(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label htmlFor="VERDECARD" className="label-checkbox">
-                    VERDECARD:
-                  </label>
-                  <input
-                    type="checkbox"
-                    name="VERDECARD"
-                    value="VERDECARD"
-                    id=""
-                    className="checkbox ms-1"
-                    onChange={(e) =>
-                      setSistemas_envolvidos(
-                        sistemas_envolvidos?.concat(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label htmlFor="SAP" className="label-checkbox">
-                    SAP:
-                  </label>
-                  <input
-                    type="checkbox"
-                    name="SAP"
-                    value="SAP"
-                    id=""
-                    className="checkbox ms-1"
-                    onChange={(e) =>
-                      setSistemas_envolvidos(
-                        sistemas_envolvidos?.concat(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div className="me-5">
-                  <label htmlFor="VCS" className="label-checkbox">
-                    VCS:
-                  </label>
-                  <input
-                    type="checkbox"
-                    name="VCS"
-                    value="VCS"
-                    id=""
-                    className="checkbox ms-1"
-                    onChange={(e) =>
-                      setSistemas_envolvidos(
-                        sistemas_envolvidos?.concat(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-              </div>
-              <label className="mt-3" htmlFor="comportamento-offline">
-                Comportamento Offline &#40;time Mercantil&#41;:
-              </label>
-              <textarea
-                name="comportamento-offline"
-                id=""
-                className="input-justificativa"
-                value={comportamento_offline}
-                onChange={(e) => setComportamento_offline(e.target.value)}
-              />
-              <h3 className="mt-3">
-                Essa CRM depende de outro desenvolvimento?
-              </h3>
-              <div className="d-flex justify-content-start">
-                <label className="label-checkbox">
-                  Sim:
-                  <input
-                    type="radio"
-                    name="depende"
-                    value="sim"
-                    id=""
-                    className="checkbox ms-1"
-                    onChange={(e) => setDependendia_outro_crm(e.target.value)}
-                    onClick={showOrHide3}
-                  />
+                <Root>
+                  <div {...getRootProps()} className="mt-3">
+                    <Label {...getInputLabelProps()}>Setores Envolvidos:</Label>
+                    <InputWrapper
+                      ref={setAnchorEl}
+                      className={focused ? "focused" : ""}
+                    >
+                      <input {...getInputProps()} />
+                      {value.map((option: FilmOptionType, index: number) => (
+                        <StyledTag
+                          label={option.setor}
+                          {...getTagProps({ index })}
+                        />
+                      ))}
+                    </InputWrapper>
+                  </div>
+                  {groupedOptions.length > 0 ? (
+                    <Listbox {...getListboxProps()}>
+                      {(groupedOptions as typeof listaSetores).map(
+                        (option, index) => (
+                          <li {...getOptionProps({ option, index })}>
+                            <span>{option.setor}</span>
+                            <CheckIcon fontSize="small" />
+                          </li>
+                        )
+                      )}
+                    </Listbox>
+                  ) : null}
+                </Root>
+                <label htmlFor="necessidade" className="pt-3">
+                  Necessidade*:
                 </label>
-
-                <label className="label-checkbox ms-2">
-                  Não:
-                  <input
-                    type="radio"
-                    name="depende"
-                    value="nao"
-                    id=""
-                    className="checkbox ms-1"
-                    onChange={(e) => setDependendia_outro_crm(e.target.value)}
-                    onClick={showOrHide}
-                  />
-                </label>
-              </div>
-              {showElement3 ? (
-                <div>
-                  <label htmlFor="numero-dependencia">
-                    Número CRM necessário:
-                  </label>
-                  <input
-                    type="text"
-                    name="numero-dependencia"
-                    id=""
-                    className="input-data-legal"
-                    value={numero_crm_dependencia}
-                    onChange={(e) => setNumero_dependencia_crm(e.target.value)}
-                  />
-                </div>
-              ) : null}
-              <label className="mt-3" htmlFor="documentos">
-                Documentos:
-              </label>
-              <div className="input-documentos d-flex">
-                {documento_anexo.length > 0 ? (
-                  <>
-                    {documento_anexo.map((value, index) => (
-                      <>
-                        {value.indexOf("image/") > -1 ? (
-                          <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                            <i className="far fa-file-image download position-relative">
-                              <button
-                                onClick={(e) => excluir_arquivo(index, e)}
-                                className="botao-excluir-arquivo"
-                              >
-                                <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                              </button>
-                            </i>
-                            <p className="texto-usuario">
-                              {nomedocumento[index]}
-                            </p>
-                          </div>
-                        ) : null}
-                        {value.indexOf("application/pdf") > -1 ? (
-                          <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                            <i className="far fa-file-pdf download position-relative">
-                              <button
-                                onClick={(e) => excluir_arquivo(index, e)}
-                                className="botao-excluir-arquivo"
-                              >
-                                <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                              </button>
-                            </i>
-                            <p className="texto-usuario">
-                              {nomedocumento[index]}
-                            </p>
-                          </div>
-                        ) : null}
-                        {value.indexOf("application/msword") > -1 ? (
-                          <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                            <i className="far fa-file-word download position-relative">
-                              <button
-                                onClick={(e) => excluir_arquivo(index, e)}
-                                className="botao-excluir-arquivo"
-                              >
-                                <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                              </button>
-                            </i>
-                            <p className="texto-usuario">
-                              {nomedocumento[index]}
-                            </p>
-                          </div>
-                        ) : null}
-                        {value.indexOf(
-                          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                        ) > -1 ? (
-                          <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                            <i className="far fa-file-excel download position-relative">
-                              <button
-                                onClick={(e) => excluir_arquivo(index, e)}
-                                className="botao-excluir-arquivo"
-                              >
-                                <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                              </button>
-                            </i>
-                            <p className="texto-usuario">
-                              {nomedocumento[index]}
-                            </p>
-                          </div>
-                        ) : null}
-                        {value.indexOf("text/plain") > -1 ? (
-                          <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
-                            <i className="far fa-file-lines download position-relative">
-                              <button
-                                onClick={(e) => excluir_arquivo(index, e)}
-                                className="botao-excluir-arquivo"
-                              >
-                                <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
-                              </button>
-                            </i>
-                            <p className="texto-usuario">
-                              {nomedocumento[index]}
-                            </p>
-                          </div>
-                        ) : null}
-                      </>
-                    ))}
-                  </>
-                ) : null}
-              </div>
-              <br />
-              <label htmlFor="" className="anexar">
-                <i className="fa-solid fa-upload"></i>
-                Anexar documentos
-                <input
-                  type="file"
-                  name=""
+                <textarea
                   id=""
-                  onChange={(e) => convertFile(e.target.files, e.target.value)}
+                  name="necessidade"
+                  className="input-objetivo"
+                  value={necessidade}
+                  onChange={(e) => setNecessidade(e.target.value)}
                 />
-              </label>
-              <div className="div-salvar">
-                <button
-                  type="submit"
-                  className="botao-salvar"
-                  onClick={criarCRM}
-                >
-                  SALVAR
-                </button>
-              </div>
-            </form>
+                <label htmlFor="impacto" className="pt-3">
+                  Impacto*:
+                </label>
+                <textarea
+                  name="impacto"
+                  id=""
+                  className="input-objetivo"
+                  value={impacto}
+                  onChange={(e) => setImpacto(e.target.value)}
+                />
+                <label htmlFor="descricao" className="pt-3">
+                  Descrição*:
+                </label>
+                <textarea
+                  name="descricao"
+                  id=""
+                  className="input-descricao"
+                  value={descricao}
+                  onChange={(e) => setDescricao(e.target.value)}
+                />
+                <label htmlFor="objetivo">Objetivo*:</label>
+                <textarea
+                  name="objetivo"
+                  id=""
+                  className="input-descricao"
+                  value={objetivo}
+                  onChange={(e) => setObjetivo(e.target.value)}
+                />
+                <label htmlFor="justificativa">Justificativa*:</label>
+                <textarea
+                  name="justificativa"
+                  id=""
+                  className="input-descricao"
+                  value={justificativa}
+                  onChange={(e) => setJustificativa(e.target.value)}
+                />
+                <label htmlFor="alternativa">Alternativas:</label>
+                <textarea
+                  name="alternativa"
+                  id=""
+                  className="input-descricao"
+                  value={alternativa}
+                  onChange={(e) => setAlternativa(e.target.value)}
+                />
+                <div className="div-versao-data">
+                  <div className="div-usuario">
+                    <p>Versão:</p>
+                    <p className="ps-2">v{versao}</p>
+                  </div>
+                  <div className="div-usuario">
+                    <p>Data criação:</p>
+                    <p className="ps-2">{hoje}</p>
+                  </div>
+                </div>
+                <label htmlFor="data-legal">
+                  Data Obrigatoriedade Legal &#40;caso exista&#41;:
+                </label>
+                <input
+                  type="date"
+                  name="data-legal"
+                  id=""
+                  className="input-data-legal"
+                  value={data_obrigatoriedade}
+                  onChange={(e) => setData_obrigatoriedade(e.target.value)}
+                />
+                <br />
+                <h3 className="mt-3">Sistemas envolvidos na mudança:</h3>
+                <div className="d-flex justify-content-between">
+                  <div>
+                    <label htmlFor="CLIQQ" className="label-checkbox">
+                      CLIQQ:
+                    </label>
+                    <input
+                      type="checkbox"
+                      name="CLIQQ"
+                      value="CLIQQ"
+                      id=""
+                      className="checkbox ms-1"
+                      onChange={(e) =>
+                        setSistemas_envolvidos(
+                          sistemas_envolvidos?.concat(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="PDV" className="label-checkbox">
+                      PDV:
+                    </label>
+                    <input
+                      type="checkbox"
+                      name="PDV"
+                      value="PDV"
+                      id=""
+                      className="checkbox ms-1"
+                      onChange={(e) =>
+                        setSistemas_envolvidos(
+                          sistemas_envolvidos?.concat(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="VERDECARD" className="label-checkbox">
+                      VERDECARD:
+                    </label>
+                    <input
+                      type="checkbox"
+                      name="VERDECARD"
+                      value="VERDECARD"
+                      id=""
+                      className="checkbox ms-1"
+                      onChange={(e) =>
+                        setSistemas_envolvidos(
+                          sistemas_envolvidos?.concat(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="SAP" className="label-checkbox">
+                      SAP:
+                    </label>
+                    <input
+                      type="checkbox"
+                      name="SAP"
+                      value="SAP"
+                      id=""
+                      className="checkbox ms-1"
+                      onChange={(e) =>
+                        setSistemas_envolvidos(
+                          sistemas_envolvidos?.concat(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="me-5">
+                    <label htmlFor="VCS" className="label-checkbox">
+                      VCS:
+                    </label>
+                    <input
+                      type="checkbox"
+                      name="VCS"
+                      value="VCS"
+                      id=""
+                      className="checkbox ms-1"
+                      onChange={(e) =>
+                        setSistemas_envolvidos(
+                          sistemas_envolvidos?.concat(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                </div>
+                <label className="mt-3" htmlFor="comportamento-offline">
+                  Comportamento Offline &#40;time Mercantil&#41;:
+                </label>
+                <textarea
+                  name="comportamento-offline"
+                  id=""
+                  className="input-justificativa"
+                  value={comportamento_offline}
+                  onChange={(e) => setComportamento_offline(e.target.value)}
+                />
+                <h3 className="mt-3">
+                  Essa CRM depende de outro desenvolvimento*?
+                </h3>
+                <div className="d-flex justify-content-start">
+                  <label className="label-checkbox">
+                    Sim:
+                    <input
+                      type="radio"
+                      name="depende"
+                      value="sim"
+                      id=""
+                      className="checkbox ms-1"
+                      onChange={(e) => setDependendia_outro_crm(e.target.value)}
+                      onClick={showOrHide3}
+                    />
+                  </label>
+
+                  <label className="label-checkbox ms-2">
+                    Não:
+                    <input
+                      type="radio"
+                      name="depende"
+                      value="nao"
+                      id=""
+                      className="checkbox ms-1"
+                      onChange={(e) => setDependendia_outro_crm(e.target.value)}
+                      onClick={showOrHide}
+                    />
+                  </label>
+                </div>
+                {showElement3 ? (
+                  <div>
+                    <label htmlFor="numero-dependencia">
+                      Número CRM necessário:
+                    </label>
+                    <input
+                      type="text"
+                      name="numero-dependencia"
+                      id=""
+                      className="input-data-legal"
+                      value={numero_crm_dependencia}
+                      onChange={(e) =>
+                        setNumero_dependencia_crm(e.target.value)
+                      }
+                    />
+                  </div>
+                ) : null}
+                <label className="mt-3" htmlFor="documentos">
+                  Documentos:
+                </label>
+                <div className="input-documentos d-flex">
+                  {documento_anexo.length > 0 ? (
+                    <>
+                      {documento_anexo.map((value, index) => (
+                        <>
+                          {value.indexOf("image/") > -1 ? (
+                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                              <i className="far fa-file-image download position-relative">
+                                <button
+                                  onClick={(e) => excluir_arquivo(index, e)}
+                                  className="botao-excluir-arquivo"
+                                >
+                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                </button>
+                              </i>
+                              <p className="texto-usuario">
+                                {nomedocumento[index]}
+                              </p>
+                            </div>
+                          ) : null}
+                          {value.indexOf("application/pdf") > -1 ? (
+                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                              <i className="far fa-file-pdf download position-relative">
+                                <button
+                                  onClick={(e) => excluir_arquivo(index, e)}
+                                  className="botao-excluir-arquivo"
+                                >
+                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                </button>
+                              </i>
+                              <p className="texto-usuario">
+                                {nomedocumento[index]}
+                              </p>
+                            </div>
+                          ) : null}
+                          {value.indexOf("application/msword") > -1 ? (
+                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                              <i className="far fa-file-word download position-relative">
+                                <button
+                                  onClick={(e) => excluir_arquivo(index, e)}
+                                  className="botao-excluir-arquivo"
+                                >
+                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                </button>
+                              </i>
+                              <p className="texto-usuario">
+                                {nomedocumento[index]}
+                              </p>
+                            </div>
+                          ) : null}
+                          {value.indexOf(
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                          ) > -1 ? (
+                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                              <i className="far fa-file-excel download position-relative">
+                                <button
+                                  onClick={(e) => excluir_arquivo(index, e)}
+                                  className="botao-excluir-arquivo"
+                                >
+                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                </button>
+                              </i>
+                              <p className="texto-usuario">
+                                {nomedocumento[index]}
+                              </p>
+                            </div>
+                          ) : null}
+                          {value.indexOf("text/plain") > -1 ? (
+                            <div className="ms-3 mt-4 pt-2 d-flex flex-column align-items-center arquivos text-center">
+                              <i className="far fa-file-lines download position-relative">
+                                <button
+                                  onClick={(e) => excluir_arquivo(index, e)}
+                                  className="botao-excluir-arquivo"
+                                >
+                                  <i className="fa-solid fa-circle-xmark excluir-arquivo"></i>
+                                </button>
+                              </i>
+                              <p className="texto-usuario">
+                                {nomedocumento[index]}
+                              </p>
+                            </div>
+                          ) : null}
+                        </>
+                      ))}
+                    </>
+                  ) : null}
+                </div>
+                <br />
+                <label htmlFor="" className="anexar">
+                  <i className="fa-solid fa-upload"></i>
+                  Anexar documentos
+                  <input
+                    type="file"
+                    name=""
+                    id=""
+                    onChange={(e) =>
+                      convertFile(e.target.files, e.target.value)
+                    }
+                  />
+                </label>
+                <br />
+                <div className="mt-4">
+                  <small>*campos obrigatórios</small>
+                </div>
+                <div className="div-salvar">
+                  <button
+                    type="submit"
+                    className="botao-salvar"
+                    onClick={criarCRM}
+                  >
+                    SALVAR
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      </section>
-    </FormStyled>
+        </section>
+      </FormStyled>
+      <ToastContainer className="p-3" position="middle-center">
+        <Toast show={showA} bg="warning">
+          <Toast.Body className="d-flex justify-content-around align-items-center">
+            {showTextoA}
+            <Button variant="secondary" onClick={() => closeToastA()}>
+              OK
+            </Button>
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
+      <ToastContainer className="p-3" position="middle-center">
+        <Toast show={showB} bg="warning">
+          <Toast.Body className="d-flex justify-content-around align-items-center">
+            {showTextoB}
+            <Button variant="secondary" onClick={() => setShowB(false)}>
+              OK
+            </Button>
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
+    </>
   );
 };
 

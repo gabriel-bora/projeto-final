@@ -52,14 +52,27 @@ const DashboardStyled = styled.section`
 
   .paginas {
     font-size: 1rem;
-    color: #dfe0eb;
-    font-weight: 400;
+    color: #a2a2ad;
+    font-weight: 600;
   }
 
   .fa-angle-left,
   .fa-angle-right {
-    color: #dfe0eb;
     font-size: 1.4rem;
+  }
+
+  .habilitado {
+    color: #a2a2ad;
+  }
+
+  .desabilitado {
+    color: #dfe0eb;
+  }
+
+  .pages {
+    border: none;
+    background-color: transparent;
+    outline: none;
   }
 `;
 

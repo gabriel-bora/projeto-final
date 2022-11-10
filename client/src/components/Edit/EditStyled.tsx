@@ -228,6 +228,10 @@ const EditStyled = styled.body<Props>`
     border-radius: 50%;
   }
 
+  small {
+    text-align: center;
+  }
+
   .div-salvar {
     display: flex;
     justify-content: center;

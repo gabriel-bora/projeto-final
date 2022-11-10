@@ -28,6 +28,14 @@ const Dashboard: React.FC = () => {
 
   let lista = listaCRM.sort((a, b) => a.id - b.id);
 
+  const [itensPerPage, setItensPerPage] = useState(6);
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const pages = Math.ceil(lista.length / itensPerPage);
+  const startIndex = currentPage * itensPerPage;
+  const endIndex = startIndex + itensPerPage;
+  const currenItens = lista.slice(startIndex, endIndex);
+
   return (
     <DashboardStyled>
       <main>
@@ -53,7 +61,7 @@ const Dashboard: React.FC = () => {
                       <div className="row mt-2 mx-0">
                         <div className="col">
                           <section className="container-fluid px-0 tabela">
-                            {lista.map((value) => (
+                            {currenItens.map((value) => (
                               <Accordion
                                 id={value.id}
                                 versao_crm={value.versao_crm}
@@ -99,10 +107,36 @@ const Dashboard: React.FC = () => {
                   <div className="row mt-2 ms-3 me-3 pb-4">
                     <div className="col-10"></div>
                     <div className="col-2 titulo-tabela d-flex justify-content-between align-items-center">
-                      <div className="paginas ms-2 ps-5">1-2 de 2</div>
+                      <div className="paginas ms-2 ps-5">
+                        {startIndex + 1}-
+                        {endIndex < lista.length ? endIndex : lista.length} de{" "}
+                        {lista.length}
+                      </div>
                       <div className="d-flex gap-2">
-                        <i className="fa-solid fa-angle-left"></i>
-                        <i className="fa-solid fa-angle-right"></i>
+                        {currentPage === 0 ? (
+                          <button className="pages" disabled>
+                            <i className="fa-solid fa-angle-left desabilitado"></i>
+                          </button>
+                        ) : (
+                          <button
+                            className="pages"
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                          >
+                            <i className="fa-solid fa-angle-left habilitado"></i>
+                          </button>
+                        )}
+                        {currentPage === pages - 1 ? (
+                          <button className="pages" disabled>
+                            <i className="fa-solid fa-angle-right desabilitado"></i>
+                          </button>
+                        ) : (
+                          <button
+                            className="pages"
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                          >
+                            <i className="fa-solid fa-angle-right habilitado"></i>
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

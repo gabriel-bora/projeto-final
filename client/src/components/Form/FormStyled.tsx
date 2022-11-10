@@ -40,6 +40,10 @@ const FormStyled = styled.body<Props>`
     margin-bottom: 42px;
   }
 
+  small {
+    text-align: center;
+  }
+
   label,
   h3 {
     font-weight: 700;
