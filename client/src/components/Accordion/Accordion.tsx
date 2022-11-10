@@ -472,14 +472,16 @@ const Accordion: React.FC<DadosCRM> = ({
             >
               <div className="container-fluid info-crm-fechado">
                 <div className="row d-flex align-items-center">
-                  <div className="col-1 p-1">{switchStatus(status)}</div>
-                  <div className="col-2">
+                  <div className="col-6 col-md-1 p-1 mt-md-0 mt-4">
+                    {switchStatus(status)}
+                  </div>
+                  <div className="col-6 col-md-2 mt-md-0 mt-4">
                     <div className="texto-bold">{n}</div>
                     <div className="texto-light pt-1">
                       Atualizada {data_relativa}
                     </div>
                   </div>
-                  <div className="col-3 d-flex">
+                  <div className="col-12 col-md-3 d-flex mt-md-0 mt-4">
                     <div>
                       <div className="avatar"></div>
                     </div>
@@ -490,30 +492,30 @@ const Accordion: React.FC<DadosCRM> = ({
                       <div className="texto-light pt-1 ps-1">{email}</div>
                     </div>
                   </div>
-                  <div className="col-3">
+                  <div className="col-12 col-md-3 mt-md-0 mt-4">
                     <div className="texto-bold">{necessidade}</div>
                     <div className="texto-light pt-1 ps-1">
                       {colaborador_setor}
                     </div>
                   </div>
-                  <div className="col-1">
+                  <div className="col-6 col-md-1 mt-md-0 mt-4">
                     <div className="texto-bold">v{versao_crm}</div>
                     <div className="texto-light pt-1">{data_inicio}</div>
                   </div>
-                  <div className="col-2">
+                  <div className="col-6 col-md-2 mt-md-0 mt-4">
                     {switchComplexidade(complexidade)}
                   </div>
                 </div>
               </div>
               <div className="container-fluid info-crm-aberto">
                 <div className="row d-flex align-items-center">
-                  <div className="col-4 d-flex justify-content-center texto-bold">
+                  <div className="col-md-4 col-12 mt-md-0 mt-4 d-flex justify-content-center texto-bold">
                     CRM nº: {n}
                   </div>
-                  <div className="col-6 d-flex justify-content-center texto-bold">
+                  <div className="col-md-6 col-12 mt-md-0 mt-4 d-flex justify-content-center texto-bold">
                     Necessidade: {necessidade}
                   </div>
-                  <div className="col-2 d-flex justify-content-center">
+                  <div className="col-md-2 col-12 mt-md-0 mt-4 d-flex justify-content-center">
                     {setorUsuario === colaborador_setor &&
                     data_arquivamento === null &&
                     versaoMaxima == versao_crm ? (
@@ -544,7 +546,7 @@ const Accordion: React.FC<DadosCRM> = ({
             <div className="accordion-body bodyAccordion">
               <section className="container-fluid m-0 p-0">
                 <div className="row p-0">
-                  <div className="col-4">
+                  <div className="col-md-4 col-12">
                     <div className="div-usuario">
                       <h6 className="pt-3">Responsável:</h6>
                       <div className="ps-3 d-flex">
@@ -993,8 +995,8 @@ const Accordion: React.FC<DadosCRM> = ({
                       </div>
                     </div>
                   </div>
-                  <div className="col-6">
-                    <div className="mb-4">
+                  <div className="col-md-6 col-12 mt-md-0 mt-4">
+                    <div className="mb-md-4 mb-0">
                       <h6 className="pt-3">Impacto:</h6>
                       <div className="texto-usuario ps-3">
                         {impacto.length > 680 ? (
@@ -1213,7 +1215,7 @@ const Accordion: React.FC<DadosCRM> = ({
                       </div>
                     </div>
                   </div>
-                  <div className="col-2">
+                  <div className="col-md-2 col-12 mt-md-0 mt-4">
                     <h6 className="pt-3">Versão:</h6>
                     <div className="texto-bold d-flex justify-content-end">
                       <div className="ps-3">v{versao_crm}</div>

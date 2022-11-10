@@ -46,7 +46,7 @@ const Dashboard: React.FC = () => {
                 <section className="container-fluid d-flex flex-column justify-content-between">
                   <div className="row">
                     <div className="container-fluid">
-                      <div className="row mt-4 ms-3 me-5 pe-1 div-titulo-tabela">
+                      <div className="row mt-4 ms-3 me-5 pe-1 div-titulo-tabela d-none d-md-flex">
                         <div className="col-1 titulo-tabela">Status</div>
                         <div className="col-2 ps-4 titulo-tabela">Nº CRM</div>
                         <div className="col-3 ps-4 titulo-tabela">
@@ -105,9 +105,9 @@ const Dashboard: React.FC = () => {
                     </div>
                   </div>
                   <div className="row mt-2 ms-3 me-3 pb-4">
-                    <div className="col-10"></div>
-                    <div className="col-2 titulo-tabela d-flex justify-content-between align-items-center">
-                      <div className="paginas ms-2 ps-5">
+                    <div className="col-12 col-md-10"></div>
+                    <div className="col-12 col-md-2 titulo-tabela d-flex justify-content-between align-items-center">
+                      <div className="paginas ms-0 ms-md-2 ps-5">
                         {startIndex + 1}-
                         {endIndex < lista.length ? endIndex : lista.length} de{" "}
                         {lista.length}
